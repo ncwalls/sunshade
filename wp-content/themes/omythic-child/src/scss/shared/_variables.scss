@@ -1,0 +1,104 @@
+@use "sass:math";
+/*----------------------------------------------------------------------
+  FONTS
+----------------------------------------------------------------------*/
+$font-family-base:     "Lato", sans-serif;
+$font-weight-base:     400;
+$font-family-headline: $font-family-base;
+$font-weight-headline: 700;
+$font-family-callout:  "Noto Serif", serif;
+$font-size-base:       16px;
+$font-size-mobile:     $font-size-base;
+$line-height-base:     1.5;
+$font-family-icons:    "Font Awesome 5 Pro"; 
+
+
+/*----------------------------------------------------------------------
+  BRANDING COLORS
+----------------------------------------------------------------------*/
+$brand-black: #000;
+$brand-bluegreen-lt: #CFE6EC;
+$brand-blue-xlt: #69B0C5;
+$brand-blue-lt: #5BC4F1;
+$brand-blue: #2D71AF;
+$brand-blue-drk: #132F49;
+// $brand-grey-lt: #d8d8d8;
+$brand-grey: #656868;
+$brand-green: #0c0;
+$brand-red: #c00;
+$brand-orange: #EE6E2D;
+$brand-yellow: #FF9D00;
+
+/* Spacing */
+$header-height: 12rem;
+$header-height-scrolled: $header-height;
+$header-mobile-height: 8rem;
+$header-mobile-height-scrolled: $header-mobile-height;
+
+/* Makespace colors */
+$makespace-blue:       #7795b5;
+$makespace-brown:      #483735;
+$makespace-green:      #b2d78c;
+$makespace-orange:     #ff7059;
+$makespace-red:        #ec453e;
+$makespace-purple:     #9677b1;
+$makespace-wing-fill:  rgba(#fff, 0.2);
+$makespace-bee-fill:   $brand-black;
+$makespace-bee-fill-hover: $brand-black;
+
+/* Social media colors */
+$facebook-blue:    #3c5b9b;
+$google-plus-red:  #f63d27;
+$instagram-blue:   #517fa4;
+$pinterest-red:    #cb2027;
+$spotify-green:    #1DB954;
+$twitter-blue:     #2daae1;
+$youtube-red:      #ff0000;
+$vimeo-blue:       #19b7ea;
+
+
+/*----------------------------------------------------------------------
+  FORMS
+----------------------------------------------------------------------*/
+$form-error-color:	   $brand-red;
+
+/*----------------------------------------------------------------------
+  CONTAINERS & GRID
+----------------------------------------------------------------------*/
+// $container-max-width: pxem(1085);
+$container-width:     85%;
+$design-width:        1400px;
+
+
+/*----------------------------------------------------------------------
+  MEDIA QUERIES & BREAKPOINTS
+----------------------------------------------------------------------*/
+$use-max-width: true;
+$mobile:   480px;
+$phablet:  640px;
+$tablet:   768px;
+$largetablet: 900px;
+$laptop:   1024px;
+$desktop:  1280px;
+$fullsize: $design-width;
+$mobile-nav-breakpoint: $laptop;
+
+
+/*----------------------------------------------------------------------
+  CALCULATIONS & STANDARDS
+  You should not have to edit anything below this line. If so and you
+  believe it's a problem with or enhancement to the framework, be sure
+  to create an issue on Github:
+
+  https://github.com/makespaceweb/makespace-child/issues
+
+----------------------------------------------------------------------*/
+$fa-font-path:       'fonts';
+// $max-width:          #{math.div($container-max-width, 10px)}rem;
+@if $use-max-width == true {
+	$phablet:  $phablet - 1px;
+	$tablet:   $tablet - 1px;
+	$laptop:   $laptop - 1px;
+	$desktop:  $desktop - 1px;
+	$fullsize: $fullsize - 1px
+}

@@ -1,0 +1,126 @@
+
+.faq-list{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	> li{
+		border-top: 1px solid rgba(#fff,0.5);
+		border-bottom: 1px solid rgba(#fff,0.5);
+		overflow: hidden;
+		margin-top: pxem(8);
+
+		&.open{
+			.question{
+				&:after{
+					// transform: translateY(-50%) rotate(180deg);
+					content: '\f068';
+				}
+			}
+			.answer{
+				grid-template-rows: 1fr;
+				// padding-top: pxem(16);
+				padding-bottom: pxem(25);
+			}
+		}
+	}
+
+	.question,
+	.answer{
+		// color: $brand-black;
+		padding: pxem(25) pxem(65) pxem(25) pxem(90);
+		position: relative;
+
+		@media (max-width: $tablet) {
+			padding-right: pxem(50);
+			padding-left: pxem(70);
+		}
+		@media (max-width: $mobile) {
+			padding-left: pxem(40);
+		}
+
+		&:before{
+			font-family: $font-family-callout;
+			font-size: pxem(38);
+			font-weight: 700;
+			line-height: 1;
+			position: absolute;
+			left: 0.3em;
+			
+			@media (max-width: $mobile) {
+				font-size: pxem(30);
+				left: 0;
+			}
+		}
+
+		p{
+			margin: 0;
+		}
+	}
+
+	.question{
+		cursor: pointer;
+
+		&:before{
+			content: 'Q';
+			top: 0.35em;
+
+			@media (max-width: $mobile) {
+				top: 0.6em;
+			}
+		}
+
+		&:after{
+			color: $brand-yellow;
+			content: '\f067';
+			font-size: pxem(24);
+			font-family: $font-family-icons;
+			position: absolute;
+			top: 50%;
+			right: pxem(8);
+			transform: translateY(-50%);
+		}
+	}
+
+	.answer{
+		display: grid;
+		grid-template-rows: 0fr;
+		padding-top: 0;
+		padding-bottom: 0;
+		overflow: hidden;
+		transition: all 0.3s;
+
+		&:before{
+			content: 'A';
+			top: -0.2em;
+
+			@media (max-width: $mobile) {
+				// top: -0.2em
+			}
+		}
+
+		.wysiwyg{
+			margin: 0;
+			max-width: none;
+			overflow: hidden;
+		}
+
+		p{
+			+ p{
+				margin-top: 0.5em;
+			}
+		}
+
+		ul,ol{
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+
+			li{
+				margin-bottom: 0.5em;
+			}
+		}
+		ul{
+			list-style: disc;
+		}
+	}
+}
