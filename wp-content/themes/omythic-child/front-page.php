@@ -87,7 +87,7 @@
 
 					<?php endif; ?>
 
-					<div class="hero-content">
+					<div class="hero-content scroll-animate-item">
 						<div class="container">
 							<?php if($hero['title']): ?>
 								<h1 class="hero-title"><?php echo text_replace_brackets($hero['title']); ?></h1>
@@ -139,8 +139,9 @@
 
 			<?php if($intro = get_field('intro')): ?>
 				<section class="home-section home-intro">
+					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-intro.png" alt="" class="curve">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($intro['title']): ?>
 								<h2 class="section-title"><?php echo text_replace_brackets($intro['title']); ?></h2>
 							<?php endif; ?>
@@ -152,7 +153,7 @@
 							<?php endif; ?>
 						</div>
 						<?php if($intro['image']): ?>
-							<figure class="image">
+							<figure class="image scroll-animate-item">
 								<img src="<?php echo $intro['image']['sizes']['large']; ?>" alt="" loading="lazy">
 							</figure>
 						<?php endif; ?>
@@ -163,7 +164,8 @@
 
 			<?php if($before_after = get_field('before_after')): ?>
 				<section class="home-section home-before-after">
-					<div class="container">
+					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-blue.png" alt="" class="curve">
+					<div class="container scroll-animate-item">
 						<div class="content">
 							<?php if($before_after['title']): ?>
 								<h2 class="section-title"><?php echo text_replace_brackets($before_after['title']); ?></h2>
@@ -185,7 +187,7 @@
 				<section class="home-section home-benefits">
 					<div class="bg-1">
 						<div class="container">
-							<div class="content">
+							<div class="content scroll-animate-item">
 								<?php if($benefits['title']): ?>
 									<h2 class="section-title"><?php echo text_replace_brackets($benefits['title']); ?></h2>
 								<?php endif; ?>
@@ -194,7 +196,7 @@
 								<?php endif; ?>
 							</div>
 							<?php if($benefits['benefits_list']): ?>
-								<div class="list-container">
+								<div class="list-container scroll-animate-item">
 									<?php if($benefits['benefits_list_title']): ?>
 										<h3 class="list-title"><span><?php echo $benefits['benefits_list_title']; ?></span></h3>
 									<?php endif; ?>
@@ -217,7 +219,7 @@
 					<div class="bg-2">
 						<div class="container">
 							<?php if($benefits['components_list']): ?>
-								<div class="list-container">
+								<div class="list-container scroll-animate-item">
 									<?php if($benefits['components_list_title']): ?>
 										<h3 class="list-title"><span><?php echo $benefits['components_list_title']; ?></span></h3>
 									<?php endif; ?>
@@ -243,7 +245,7 @@
 			<?php if($customization = get_field('customization')): ?>
 				<section class="home-section home-customization">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($customization['label']): ?>
 								<div class="section-label"><?php echo $customization['label']; ?></div>
 							<?php endif; ?>
@@ -254,8 +256,8 @@
 								<div class="wysiwyg"><?php echo $customization['content']; ?></div>
 							<?php endif; ?>
 						</div>
-						<div class="list-container">
-							<svg width="96" height="65" viewBox="0 0 96 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<div class="list-container scroll-animate-item">
+							<svg class="icon" width="96" height="65" viewBox="0 0 96 65" fill="none" xmlns="http://www.w3.org/2000/svg">
 								<path d="M77.0079 34.4035H60.8532V51.2139H51.5743V11.4518H60.8532V28.0734H77.0079V11.4518H86.2868V30.3356L95.9055 0H20.6071L0 65H75.2984L79.6683 51.2139H77.0079V34.4035ZM46.099 43.6274C45.4605 45.2305 44.5371 46.6242 43.3288 47.8154C42.117 49.0066 40.6271 49.9438 38.8524 50.6269C37.0776 51.31 35.0626 51.6499 32.8072 51.6499C31.5714 51.6499 30.3116 51.5228 29.0277 51.2688C27.7439 51.0148 26.5046 50.6543 25.3031 50.1909C24.1017 49.7275 22.9757 49.1782 21.9184 48.5397C20.8645 47.9047 19.9445 47.1941 19.1619 46.4114L21.8909 42.0998C22.09 41.7737 22.3715 41.5094 22.7354 41.3103C23.0993 41.1112 23.4906 41.0082 23.9094 41.0082C24.4552 41.0082 25.0045 41.1798 25.5606 41.5265C26.1167 41.8732 26.7415 42.2543 27.4452 42.6731C28.1455 43.0919 28.9488 43.4729 29.8619 43.8196C30.7716 44.1664 31.8461 44.338 33.0819 44.338C34.7571 44.338 36.0581 43.9707 36.985 43.2326C37.9118 42.4946 38.3752 41.3274 38.3752 39.7243C38.3752 38.7975 38.1212 38.0422 37.6097 37.4587C37.1017 36.8751 36.4323 36.3945 35.605 36.0135C34.7777 35.6324 33.8336 35.296 32.7798 35.0042C31.7259 34.7124 30.6411 34.3898 29.5323 34.0362C28.4236 33.6826 27.3388 33.2466 26.2849 32.7248C25.2311 32.2065 24.287 31.5234 23.4597 30.6789C22.6324 29.8344 21.963 28.7771 21.455 27.5139C20.9469 26.2506 20.6895 24.6887 20.6895 22.835C20.6895 21.3451 20.9881 19.8862 21.5889 18.4684C22.1896 17.0507 23.0718 15.784 24.2355 14.6752C25.3993 13.5664 26.8273 12.6773 28.5197 12.0148C30.212 11.3523 32.1481 11.0193 34.3314 11.0193C35.55 11.0193 36.7378 11.1154 37.8946 11.3042C39.0481 11.4964 40.1466 11.7779 41.1833 12.1487C42.22 12.5228 43.188 12.9657 44.0908 13.4875C44.9937 14.0092 45.7969 14.5928 46.5075 15.2485L44.2144 19.5326C43.9432 19.9686 43.6549 20.2981 43.3562 20.5144C43.0576 20.7341 42.6697 20.8405 42.1959 20.8405C41.7771 20.8405 41.3274 20.7101 40.8434 20.4457C40.3594 20.1814 39.8136 19.8862 39.206 19.5601C38.5949 19.234 37.9015 18.9387 37.1188 18.6744C36.3362 18.4101 35.4436 18.2796 34.4447 18.2796C32.7146 18.2796 31.4307 18.6469 30.5828 19.385C29.7349 20.1231 29.3127 21.1186 29.3127 22.375C29.3127 23.1748 29.5667 23.8408 30.0782 24.366C30.5862 24.8946 31.2556 25.3478 32.0829 25.7322C32.9102 26.1133 33.8577 26.4634 34.9218 26.7827C35.986 27.1019 37.0742 27.4555 38.183 27.8468C39.2918 28.2382 40.38 28.6982 41.4442 29.2234C42.5083 29.752 43.4558 30.4249 44.2831 31.2419C45.1104 32.0589 45.7798 33.0578 46.2878 34.2318C46.7959 35.4059 47.0533 36.8202 47.0533 38.4748C47.0533 40.3113 46.7341 42.0312 46.099 43.6343V43.6274Z" fill="#0071B4"/>
 							</svg>
 
@@ -266,22 +268,24 @@
 								<ul class="customization-list">
 									<?php foreach($customization['customization_list'] as $item): ?>
 										<li>
-											<?php if($item['title']): ?>
-												<h4 class="title"><?php echo $item['title']; ?></h4>
-											<?php endif; ?>
-											<?php if($item['description']): ?>
-												<div class="description"><?php echo $item['description']; ?></div>
-											<?php endif; ?>
+											<div class="inner">
+												<?php if($item['title']): ?>
+													<h4 class="title"><?php echo $item['title']; ?></h4>
+												<?php endif; ?>
+												<?php if($item['description']): ?>
+													<div class="description"><?php echo $item['description']; ?></div>
+												<?php endif; ?>
+											</div>
 										</li>
 									<?php endforeach; ?>
 								</ul>
 							<?php endif; ?>
 						</div>
 						<?php if($customization['note']): ?>
-							<div class="note"><p><?php echo $customization['note']; ?></p></div>
+							<div class="note scroll-animate-item"><p><?php echo $customization['note']; ?></p></div>
 						<?php endif; ?>
 						<?php if($customization['buttons']): ?>
-							<p class="buttons">
+							<p class="buttons scroll-animate-item">
 								<?php foreach($customization['buttons'] as $button): ?>
 									<a href="<?php echo $button['button']['url']; ?>" target="<?php echo $button['button']['target']; ?>" class="button"><?php echo $button['button']['title']; ?></a>
 								<?php endforeach; ?>
@@ -294,7 +298,7 @@
 			<?php if($gallery = get_field('gallery')): ?>
 				<section class="home-section home-gallery">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($gallery['label']): ?>
 								<div class="section-label"><?php echo $gallery['label']; ?></div>
 							<?php endif; ?>
@@ -306,7 +310,7 @@
 							<?php endif; ?>
 						</div>
 						<?php if($gallery_images = $gallery['images']): ?>
-							<div class="gallery">
+							<div class="gallery scroll-animate-item">
 								<figure class="gallery-main">
 									<a href="<?php echo $gallery_images[0]['sizes']['large']; ?>" data-action="gallery" data-index="0">
 										<img src="<?php echo $gallery_images[0]['sizes']['large']; ?>" alt="">
@@ -332,7 +336,7 @@
 			<?php if($uses = get_field('uses')): ?>
 				<section class="home-section home-uses">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($uses['label']): ?>
 								<div class="section-label"><?php echo $uses['label']; ?></div>
 							<?php endif; ?>
@@ -344,7 +348,7 @@
 							<?php endif; ?>
 						</div>
 						<?php if($uses['uses_list']): ?>
-							<ul class="uses-list">
+							<ul class="uses-list scroll-animate-item">
 								<?php foreach($uses['uses_list'] as $item): ?>
 									<li>
 										<div class="image">
@@ -363,10 +367,10 @@
 							</ul>
 						<?php endif; ?>
 						<?php if($uses['quote']): ?>
-							<blockquote class="quote"><p><?php echo $uses['quote']; ?></p></blockquote>
+							<blockquote class="quote scroll-animate-item"><p><?php echo $uses['quote']; ?></p></blockquote>
 						<?php endif; ?>
 						<?php if($uses['button']): ?>
-							<p class="buttons">
+							<p class="buttons scroll-animate-item">
 								<a href="<?php echo $uses['button']['url']; ?>" target="<?php echo $uses['button']['target']; ?>" class="button"><?php echo $uses['button']['title']; ?></a>
 							</p>
 						<?php endif; ?>
@@ -376,8 +380,9 @@
 
 			<?php if($testimonials = get_field('testimonials')): ?>
 				<section class="home-section home-testimonials">
+					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-orange-top.png" alt="" class="curve top">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($testimonials['label']): ?>
 								<div class="section-label"><?php echo $testimonials['label']; ?></div>
 							<?php endif; ?>
@@ -389,7 +394,7 @@
 							<?php endif; ?>
 						</div>
 						<?php if($testimonials['quote']): ?>
-							<blockquote class="testimonial">
+							<blockquote class="testimonial scroll-animate-item">
 								<p class="quote"><?php echo $testimonials['quote']; ?></p>
 								<?php if($testimonials['quote_cite']): ?>
 									<cite class="cite"><?php echo $testimonials['quote_cite']; ?></cite>
@@ -397,13 +402,14 @@
 							</blockquote>
 						<?php endif; ?>
 					</div>
+					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-orange-bottom.png" alt="" class="curve bottom">
 				</section>
 			<?php endif; ?>
 
 			<?php if($faq = get_field('faq')): ?>
 				<section class="home-section home-faq">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($faq['label']): ?>
 								<div class="section-label"><?php echo $faq['label']; ?></div>
 							<?php endif; ?>
@@ -415,7 +421,7 @@
 							<?php endif; ?>
 						</div>
 						<?php if($faq['faqs']): ?>
-							<ul class="faq-list">
+							<ul class="faq-list scroll-animate-item">
 								<?php foreach($faq['faqs'] as $item): ?>
 									<li data-action="faq">
 										<div class="question">
@@ -435,7 +441,7 @@
 			<?php if($contact = get_field('contact')): ?>
 				<section class="home-section home-contact">
 					<div class="container">
-						<div class="content">
+						<div class="content scroll-animate-item">
 							<?php if($contact['label']): ?>
 								<div class="section-label"><?php echo $contact['label']; ?></div>
 							<?php endif; ?>

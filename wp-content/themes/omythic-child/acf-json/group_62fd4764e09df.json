@@ -514,7 +514,7 @@
         },
         {
             "key": "field_685ca9bc321c8",
-            "label": "Benefits",
+            "label": "Benefits, etc",
             "name": "",
             "aria-label": "",
             "type": "tab",
@@ -532,7 +532,7 @@
         },
         {
             "key": "field_685ca9c3321c9",
-            "label": "Benefits",
+            "label": "Benefits, etc",
             "name": "benefits",
             "aria-label": "",
             "type": "group",
@@ -1825,5 +1825,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1750913069
+    "modified": 1750992228
 }

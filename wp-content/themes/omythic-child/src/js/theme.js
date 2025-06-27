@@ -215,6 +215,52 @@
 	};
 
 
+	var headerCountdown = function() {
+
+		var timerContainer = $('.countdown-timer');
+		var daysEl = timerContainer.find('.days').find('.number');
+		var hoursEl = timerContainer.find('.hrs').find('.number');
+		var minsEl = timerContainer.find('.mins').find('.number');
+		var secsEl = timerContainer.find('.secs').find('.number');
+
+		var endDate = timerContainer.attr('data-enddate');
+		var targetTime = new Date(endDate);
+		var _second = 1000;
+		var _minute = _second * 60;
+		var _hour = _minute * 60;
+		var _day = _hour * 24;
+		var timer;
+
+		// console.log(targetTime);
+
+		function showRemaining() {
+	        var now = new Date();
+	        var distance = targetTime - now;
+	      
+	        if (distance < 0) {
+	            clearInterval(timer);
+	            // document.getElementById('countdown').innerHTML = 'EXPIRED!';
+	            return;
+	        }
+
+	        var days = Math.floor(distance / _day);
+	        var hours = Math.floor((distance % _day) / _hour);
+	        var minutes = Math.floor((distance % _hour) / _minute);
+	        var seconds = Math.floor((distance % _minute) / _second);
+
+	        daysEl.html(days);
+			hoursEl.html(hours);
+			minsEl.html(minutes);
+			secsEl.html(seconds);
+
+	        // console.log(days + 'days ' + hours + 'hrs ' + minutes + 'mins ' + seconds + 'secs');
+	    }
+
+	    timer = setInterval(showRemaining, _minute);
+	};
+
+
+
 	$(document).ready(function(){
 		homeHeroSlider();
 		heroVideo();
@@ -223,6 +269,7 @@
 		blockGallery();
 		homeGallery();
 		faqs();
+		headerCountdown();
 	});
 
     window.addEventListener('load', function() {

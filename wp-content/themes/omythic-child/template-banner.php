@@ -1,5 +1,5 @@
 <?php
-	$header_image = get_field( 'default_header_image', 'option' );
+	/*$header_image = get_field( 'default_header_image', 'option' );
 
 	if( is_singular() && get_field( 'header_image' ) ){
 		$header_image = get_field( 'header_image' );
@@ -56,8 +56,9 @@
 			}
 		}
 	</style>
-<?php endif; ?>
+<?php endif;*/ ?>
 <aside class="msw-page-banner">
+	<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-banner.png" alt="" class="curve">
 </aside>
 
 <div id="breadcrumbs">

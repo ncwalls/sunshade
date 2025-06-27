@@ -1,17 +1,82 @@
 .site-footer {
+	background: linear-gradient(180deg, $brand-blue-xlt 3.24%, $brand-blue-drk 132.43%);
+	color: #fff;
+	margin-top: pxem(100);
+	padding: pxem(88) 0 pxem(20) 0;
+	position: relative;
+
+	.curve{
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		z-index: 1;
+	}
 
 	.container {
+		position: relative;
+		z-index: 2;
+	}
+
+	.row{
+		display: flex;
+		gap: 6%;
+
+		@media (max-width: $laptop) {
+			display: block;
+		}
+	}
+
+	.footer-logo{
+		flex: 0 0 auto;
+		max-width: pxem(254);
+		width: 100%;
+		
+		@media (max-width: $laptop) {
+			margin: 0 auto pxem(30) auto;
+		}
+	}
+
+	.footer-content{
+		flex: 1;
+		text-align: center;
+
+		.title{
+			font-size: pxem(32);
+			font-weight: 700;
+			margin: 0 0 0.4em 0;
+
+			i{
+				font-family: $font-family-callout;
+				font-weight: 600;
+			}
+		}
+
+		.wysiwyg{
+
+		}
 	}
 
 }
 
 .site-footer-menu {
+	color: $brand-blue-xlt;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	margin-top: pxem(50);
+
+	@media (max-width: $tablet) {
+		display: block;
+		text-align: center;
+	}
 }
 
 .footer-inlinks{
+	font-size: pxem(13);
+
 	.copyright{
 		display: inline-block;
 		margin: 0 0.5rem 0 0;
@@ -46,11 +111,25 @@
 		}
 
 	}
+
+	a{
+		color: $brand-blue-xlt;
+		text-decoration: underline;
+
+		&:hover{
+			color: #fff;
+		}
+	}
 }
 
 .footer-outlinks{
 	display: flex;
 	align-items: center;
+	
+	@media (max-width: $tablet) {
+		margin-top: pxem(30);
+		justify-content: center;
+	}
 }
 
 .footer-social{
@@ -67,15 +146,19 @@
 	}
 
 	a{
-		background: $brand-grey;
+		background: $brand-yellow;
 		border-radius: 50%;
-		color: $brand-black;
+		color: $brand-blue-drk;
 		display: block;
 		font-size: pxem(17);
 		line-height: 1.7em;
 		width: 1.7em;
 		height: 1.7em;
 		text-align: center;
+
+		&:hover{
+			scale: 1.05;
+		}
 
 		svg{
 			display: block;
@@ -84,7 +167,7 @@
 			margin: auto;
 
 			path{
-				fill: $brand-black;
+				fill: $brand-blue-drk;
 			}
 		}
 	}
@@ -101,15 +184,15 @@
 
 	.omythic{
 		display: block;
-		width: pxem(76);
+		width: pxem(111);
 
 		svg{
 			display: block;
 			width: 100%;
-			height: pxem(13.4);
+			height: pxem(23);
 
 			path{
-				fill: $brand-black;
+				fill: #fff;
 			}
 		}
 	}

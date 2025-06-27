@@ -9,10 +9,12 @@ option {
 }
 
 label {
+	color: $brand-grey;
 	cursor: pointer;
-	font-size: pxem(13);
+	font-size: pxem(14);
 	font-family: inherit;
 	font-weight: inherit;
+	letter-spacing: 0.04em;
 	line-height: 1;
 	text-transform: uppercase;
 }
@@ -26,13 +28,25 @@ select[multiple] {
 	border-radius: 0;
 	box-sizing: border-box;
 	box-shadow: none;
+	color: $brand-grey;
 	display: block;
 	font-family: $font-family-base;
-	font-size: $font-size-base;
-	line-height: normal;
+	font-size: pxem(14);
+	font-weight: 400;
+	line-height: 1;
 	margin-bottom: 0;
-	padding: 0.5em 1em;
+	padding: 0.7em 1em;
 	width: 100%;
+}
+
+select{
+	text-transform: uppercase;
+}
+
+input,
+textarea{
+	border-left: 1px solid #000;
+	border-bottom: 1px solid #000;
 }
 
 fieldset{
@@ -115,7 +129,7 @@ input[type="submit"],
 	line-height: normal;
 	padding: 0.5em 1.2em;
 	text-align: center;
-	transition: all 0.3s;
+	// transition: all 0.3s;
 
 	&.outline{
 		background: none;
@@ -124,6 +138,7 @@ input[type="submit"],
 	}
 
 	&:hover {
+		scale: 1.03;
 	}
 }
 
@@ -134,14 +149,14 @@ input[type="submit"],
 .gform_fields {
 	@include clearfix;
 	list-style: none;
-	margin: 0 pxem(-10);
+	margin: 0 pxem(-20);
 	padding: 0;
 }
 
 .gfield {
 	float: left;
-	margin-bottom: pxem(10);
-	padding: 0 pxem(10);
+	margin-bottom: pxem(20);
+	padding: 0 pxem(20);
 	width: 100%;
 
 	&.gfield_visibility_administrative,
@@ -170,10 +185,46 @@ input[type="submit"],
 		}
 	}
 
+	&.gfield--input-type-text,
+	&.gfield--input-type-email,
+	&.gfield--input-type-phone,
+	&.gfield--input-type-textarea{
+		display: flex;
+		flex-direction: column-reverse;
+
+		.gfield_label{
+			margin: 0.5em 0 0 0;
+		}
+	}
+
+	&.gfield--input-type-select{
+		display: flex;
+		align-items: center;
+		gap: 1em;
+
+		@media (max-width: $tablet) {
+			display: block;
+			margin-top: 0.5em;
+			margin-bottom: 1.5em;
+
+			label{
+				margin: 0 0 0.5em 0;
+			}
+		}
+		
+		.ginput_container{
+			flex: 1;
+		}
+		select{
+			padding: 1em;
+			width: 100%;
+		}
+	}
+
 	label {
 		display: block;
 		line-height: 1;
-		margin-bottom: 0.5rem;
+		// margin-bottom: 0.5rem;
 	}
 
 	input,
@@ -183,7 +234,7 @@ input[type="submit"],
 		width: 100%;
 	}
 	textarea {
-		height: 14rem;
+		height: pxem(120);
 	}
 
 	.gform_fileupload_rules,
@@ -329,16 +380,16 @@ input[type="submit"],
 	}
 }
 .ginput_container_select{
-	background: #fff;
+	background: rgba(#D1D7D8, 0.32);
 	position: relative;
 
 	&:before{
-		color: $brand-black;
+		color: $brand-yellow;
 		content: '\f107';
 		display: block;
 		font-family: $font-family-icons;
-		font-size: 2.1rem;
-		font-weight: 400;
+		font-size: 2rem;
+		font-weight: 700;
 		position: absolute;
 		top: 50%;
 		right: 1.5rem;
@@ -481,7 +532,8 @@ fieldset.gfield.gfield--type-address{
 }
 
 .gform_footer{
-	text-align: right;
+	margin-top: 1em;
+	text-align: center;
 	
 	button,
 	input[type="button"],
