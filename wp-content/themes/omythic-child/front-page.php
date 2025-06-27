@@ -138,7 +138,7 @@
 			<?php endif; ?>
 
 			<?php if($intro = get_field('intro')): ?>
-				<section class="home-section home-intro">
+				<section class="home-section home-intro" id="home-section-intro">
 					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-intro.png" alt="" class="curve">
 					<div class="container">
 						<div class="content scroll-animate-item">
@@ -163,7 +163,7 @@
 
 
 			<?php if($before_after = get_field('before_after')): ?>
-				<section class="home-section home-before-after">
+				<section class="home-section home-before-after" id="home-section-beforeafter">
 					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-blue.png" alt="" class="curve">
 					<div class="container scroll-animate-item">
 						<div class="content">
@@ -184,7 +184,7 @@
 			<?php endif; ?>
 
 			<?php if($benefits = get_field('benefits')): ?>
-				<section class="home-section home-benefits">
+				<section class="home-section home-benefits" id="home-section-benefits">
 					<div class="bg-1">
 						<div class="container">
 							<div class="content scroll-animate-item">
@@ -243,7 +243,7 @@
 			<?php endif; ?>
 
 			<?php if($customization = get_field('customization')): ?>
-				<section class="home-section home-customization">
+				<section class="home-section home-customization" id="home-section-customization">
 					<div class="container">
 						<div class="content scroll-animate-item">
 							<?php if($customization['label']): ?>
@@ -296,7 +296,7 @@
 			<?php endif; ?>
 
 			<?php if($gallery = get_field('gallery')): ?>
-				<section class="home-section home-gallery">
+				<section class="home-section home-gallery" id="home-section-gallery">
 					<div class="container">
 						<div class="content scroll-animate-item">
 							<?php if($gallery['label']): ?>
@@ -334,7 +334,7 @@
 			<?php endif; ?>
 
 			<?php if($uses = get_field('uses')): ?>
-				<section class="home-section home-uses">
+				<section class="home-section home-uses" id="home-section-uses">
 					<div class="container">
 						<div class="content scroll-animate-item">
 							<?php if($uses['label']): ?>
@@ -379,7 +379,7 @@
 			<?php endif; ?>
 
 			<?php if($testimonials = get_field('testimonials')): ?>
-				<section class="home-section home-testimonials">
+				<section class="home-section home-testimonials" id="home-section-testimonials">
 					<img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/curve-orange-top.png" alt="" class="curve top">
 					<div class="container">
 						<div class="content scroll-animate-item">
@@ -407,7 +407,7 @@
 			<?php endif; ?>
 
 			<?php if($faq = get_field('faq')): ?>
-				<section class="home-section home-faq">
+				<section class="home-section home-faq" id="home-section-faq">
 					<div class="container">
 						<div class="content scroll-animate-item">
 							<?php if($faq['label']): ?>
@@ -439,7 +439,7 @@
 			<?php endif; ?>
 
 			<?php if($contact = get_field('contact')): ?>
-				<section class="home-section home-contact">
+				<section class="home-section home-contact" id="home-section-contact">
 					<div class="container">
 						<div class="content scroll-animate-item">
 							<?php if($contact['label']): ?>
