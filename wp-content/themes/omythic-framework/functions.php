@@ -1030,30 +1030,30 @@ class MakespaceFramework {
 	}
 
 	function wpseo_breadcrumb_links( $crumbs ){
-		if( class_exists( 'WooCommerce' ) ){
-			if( is_shop() || is_product_category() || is_product_tag() || is_product() || is_cart() || is_checkout() || is_account_page() ){
-				$woocommerce_shop_page_id = get_option( 'woocommerce_shop_page_id' );
-				$did_replace_product_link = false;
-				for( $i = 0; $i < count( $crumbs ); $i++ ){
-					if( array_key_exists( 'ptarchive', $crumbs[ $i ] ) ){
-						$crumbs[ $i ] = array(
-							'text' => get_the_title( $woocommerce_shop_page_id ),
-							'url' => get_permalink( $woocommerce_shop_page_id ),
-							'allow_html' => 1
-						);
-						$did_replace_product_link = true;
-					}
-				}
-				if( !$did_replace_product_link ){
-					$shop_page_link = array( array(
-						'text' => get_the_title( $woocommerce_shop_page_id ),
-						'url' => get_permalink( $woocommerce_shop_page_id ),
-						'allow_html' => 1
-					) );
-					array_splice( $crumbs, 1, 0, $shop_page_link );
-				}
-			}
-		}
+		// if( class_exists( 'WooCommerce' ) ){
+		// 	if( is_shop() || is_product_category() || is_product_tag() || is_product() || is_cart() || is_checkout() || is_account_page() ){
+		// 		$woocommerce_shop_page_id = get_option( 'woocommerce_shop_page_id' );
+		// 		$did_replace_product_link = false;
+		// 		for( $i = 0; $i < count( $crumbs ); $i++ ){
+		// 			if( array_key_exists( 'ptarchive', $crumbs[ $i ] ) ){
+		// 				$crumbs[ $i ] = array(
+		// 					'text' => get_the_title( $woocommerce_shop_page_id ),
+		// 					'url' => get_permalink( $woocommerce_shop_page_id ),
+		// 					'allow_html' => 1
+		// 				);
+		// 				$did_replace_product_link = true;
+		// 			}
+		// 		}
+		// 		if( !$did_replace_product_link ){
+		// 			$shop_page_link = array( array(
+		// 				'text' => get_the_title( $woocommerce_shop_page_id ),
+		// 				'url' => get_permalink( $woocommerce_shop_page_id ),
+		// 				'allow_html' => 1
+		// 			) );
+		// 			array_splice( $crumbs, 1, 0, $shop_page_link );
+		// 		}
+		// 	}
+		// }
 		return $crumbs;
 	}
 

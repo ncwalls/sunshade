@@ -822,3 +822,95 @@ class sub_menu_walker extends Walker_Nav_Menu {
 // 		return get_next_post();
 // 	}
 // }
+remove_action( 'woocommerce_before_main_content',  'woocommerce_breadcrumb', 20 );
+remove_action( 'woocommerce_shop_loop_header', 'woocommerce_product_taxonomy_archive_header', 10 );
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating', 5 );
+remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 10 );
+remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+
+add_action('wp_ajax_woocommerce_ajax_add_to_cart', 'woocommerce_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart', 'woocommerce_ajax_add_to_cart');        
+function woocommerce_ajax_add_to_cart() {
+    $product_id = apply_filters('woocommerce_add_to_cart_product_id', absint($_POST['product_id']));
+    $quantity = empty($_POST['quantity']) ? 1 : wc_stock_amount($_POST['quantity']);
+    $variation_id = absint($_POST['variation_id']);
+    $passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, $quantity);
+    $product_status = get_post_status($product_id);
+
+    if ($passed_validation && WC()->cart->add_to_cart($product_id, $quantity, $variation_id) && 'publish' === $product_status) {
+
+        do_action('woocommerce_ajax_added_to_cart', $product_id);
+
+        if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+            wc_add_to_cart_message(array($product_id => $quantity), true);
+        }
+
+        WC_AJAX :: get_refreshed_fragments();
+    } else {
+
+        $data = array(
+            'error' => true,
+            'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink($product_id), $product_id));
+
+        echo wp_send_json($data);
+    }
+
+    wp_die();
+}
+
+add_filter( 'woocommerce_add_to_cart_fragments', 'iconic_cart_count_fragments', 10, 1 );
+function iconic_cart_count_fragments( $fragments ) {
+    $fragments['span.cart-count'] = '<span class="cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';
+    return $fragments;
+}
+
+/* product archive */
+add_action( 'woocommerce_before_main_content',  function(){
+	echo '<div class="container main">';
+	if(!is_singular('product')){
+		// echo '<header class="woocommerce-products-header">';
+			echo '<h1 class="woocommerce-products-header__title page-title">';
+				woocommerce_page_title();
+			echo '</h1>';
+		// echo '</header>';
+	}
+	do_action( 'woocommerce_archive_description' );
+}, 20 );
+
+add_action( 'woocommerce_after_main_content',  function(){
+	echo '</div>'; // .container.main
+}, 5 );
+
+
+add_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 15 );
+
+
+/* product single */
+add_action( 'woocommerce_before_single_product',  function(){
+	echo '<a href="' . get_permalink(wc_get_page_id( 'shop' )) . '" class="back-link">Back to All Products</a>';
+}, 20 );
+
+add_action('init', 'product_mobile');
+function product_mobile(){
+    if (wp_is_mobile()) {
+        // move title
+        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
+        add_action('woocommerce_before_single_product', 'woocommerce_template_single_title', 25);
+
+        // move rating
+		// remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10);
+		// add_action('woocommerce_before_single_product', 'woocommerce_template_single_rating', 5);
+
+        //move price
+        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_price', 10);
+        add_action('woocommerce_before_single_product', 'woocommerce_template_single_price', 27);
+    }
+}
+
+
+add_action( 'woocommerce_single_product_summary', function(){
+	the_content();
+}, 20 );

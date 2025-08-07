@@ -2,7 +2,7 @@
   Gulp customizations for this installation
 ----------------------------------------------------------------------*/
 // Direct url to the localhost installation for this site.
-const localhostURL = 'http://localhost/sunshade'
+const localhostURL = 'http://localhost/livingtheaqualife.com'
 
 // Additional javascript files you'd like to include in scripts.min.js
 // See builtInJavascript below to learn what's already included
