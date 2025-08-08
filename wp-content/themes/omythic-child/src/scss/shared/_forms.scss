@@ -115,7 +115,8 @@ textarea{
 input[type="button"],
 input[type="submit"],
 .button,
-.wp-block-button__link{
+.wp-block-button__link,
+.wc-block-components-button{
 	background: linear-gradient(47deg, $brand-orange 26.75%, $brand-yellow 76.9%);
 	border: 0;
 	border-radius: 1.9em;
@@ -129,6 +130,7 @@ input[type="submit"],
 	line-height: normal;
 	padding: 0.5em 1.2em;
 	text-align: center;
+	text-decoration: none;
 	// transition: all 0.3s;
 
 	&.outline{
@@ -139,6 +141,12 @@ input[type="submit"],
 
 	&:hover {
 		scale: 1.03;
+	}
+
+	&.wc-block-components-totals-coupon__button{
+		font-size: pxem(18);
+		min-height: 0 !important;
+		padding: 0;
 	}
 }
 

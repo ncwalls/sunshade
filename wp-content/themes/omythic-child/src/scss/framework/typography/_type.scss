@@ -4,7 +4,7 @@ h3,
 h4,
 h5,
 h6 {
-	color: inherit;
+	// color: $brand-black;
 	font-family: $font-family-headline;
 	font-weight: $font-weight-headline;
 	line-height: 1.1;
@@ -12,6 +12,7 @@ h6 {
 	word-wrap: break-word;
 }
 h1{
+	color: $brand-blue;
 	font-size: pxem(44);
 	line-height: 1;
 }

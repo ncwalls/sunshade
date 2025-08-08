@@ -11,6 +11,7 @@
 	.curve{
 		display: block;
 		opacity: 0;
+		pointer-events: none;
 		position: absolute;
 		top: 100%;
 		right: 0;
@@ -187,3 +188,51 @@
 	}
 }
 
+
+
+.header-cart{
+	// margin-left: pxem(70);
+	display: block;
+	position: relative;
+	top: 0.8em;
+	width: 1.5em;
+
+	// @media (max-width: $phablet) {
+	// 	margin-left: pxem(40);
+	// }
+
+	svg{
+		display: block;
+		width: 100%;
+		height: auto;
+
+		path{
+			fill: #fff;
+			transition: fill 0.3s;
+
+			.scrolled &{
+				fill: $brand-blue;
+			}
+		}
+	}
+
+	.cart-count{
+		// background: $brand-blue;
+		// border-radius: 50%;
+		color: #fff;
+		font-size: 14px;
+		font-weight: 700;
+		line-height: 1;
+		position: absolute;
+		top: -1em;
+		left: 10%;
+		width: 90%;
+		// height: 1.6rem;
+		text-align: center;
+		transition: color 0.3s;
+
+		.scrolled &{
+			color: $brand-blue;
+		}
+	}
+}

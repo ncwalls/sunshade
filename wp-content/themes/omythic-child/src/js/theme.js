@@ -259,6 +259,74 @@
 	    timer = setInterval(showRemaining, _minute);
 	};
 
+	
+	var productDetail = function() {
+		
+		// $('[data-action="accordian-toggle"]').on('click', function(e) {
+		// 	$(this).parents('.accordian-section').toggleClass('vis');
+		// });
+	 	
+	 	var wrapQuantityInput = function() {
+	        // Target the quantity input
+	        var $quantityInput = $('input.qty:not(.buttons-added)');
+
+	        $quantityInput.each(function() {
+	            var $input = $(this);
+	            // Only wrap if not already wrapped
+	            if (!$input.parent().hasClass('custom-quantity-wrapper')) {
+	                $input.wrap('<div class="custom-quantity-wrapper"></div>');
+	                $input.before('<button type="button" class="quantity-minus"><i class="far fa-minus"><span>-</span></i></button>');
+	                $input.after('<button type="button" class="quantity-plus"><i class="far fa-plus"><span>+</span></i></button>');
+	                $input.addClass('buttons-added');
+	            }
+	        });
+	    }
+
+	    // Initial wrap
+	    wrapQuantityInput();
+
+	    // Re-wrap after variation changes (for variable products)
+	    $(document).on('found_variation', 'form.variations_form', function() {
+	        wrapQuantityInput();
+	    });
+
+	    // Handle plus button click
+	    $(document).on('click', '.quantity-plus', function() {
+	        var $input = $(this).siblings('input.qty');
+	        var step = parseFloat($input.attr('step')) || 1;
+	        var max = parseFloat($input.attr('max')) || Infinity;
+	        var currentVal = parseFloat($input.val()) || 0;
+	        var newVal = currentVal + step;
+
+	        if (newVal <= max) {
+	            $input.val(newVal).trigger('change');
+	        }
+	    });
+
+	    // Handle minus button click
+	    $(document).on('click', '.quantity-minus', function() {
+	        var $input = $(this).siblings('input.qty');
+	        var step = parseFloat($input.attr('step')) || 1;
+	        var min = parseFloat($input.attr('min')) || 1;
+	        var currentVal = parseFloat($input.val()) || 0;
+	        var newVal = currentVal - step;
+
+	        if (newVal >= min) {
+	            $input.val(newVal).trigger('change');
+	        }
+	    });
+
+		$('.woocommerce-product-gallery').magnificPopup({
+			delegate: 'a',
+			type: 'image',
+			gallery: {
+				enabled: true
+			},
+			removalDelay: 300,
+			mainClass: 'mfp-fade'
+		});
+	};
+
 
 
 	$(document).ready(function(){
@@ -270,6 +338,7 @@
 		homeGallery();
 		faqs();
 		headerCountdown();
+		productDetail();
 	});
 
     window.addEventListener('load', function() {

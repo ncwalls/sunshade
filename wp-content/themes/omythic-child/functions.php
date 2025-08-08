@@ -830,6 +830,11 @@ remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_l
 remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 10 );
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+add_action( 'woocommerce_after_shop_loop_item_title', 'output_product_excerpt', 35 );
+function output_product_excerpt() {
+	global $post;
+	echo '<div class="description">' . $post->post_excerpt . '</div>';
+}
 
 add_action('wp_ajax_woocommerce_ajax_add_to_cart', 'woocommerce_ajax_add_to_cart');
 add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart', 'woocommerce_ajax_add_to_cart');        
@@ -890,8 +895,11 @@ add_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop
 
 /* product single */
 add_action( 'woocommerce_before_single_product',  function(){
-	echo '<a href="' . get_permalink(wc_get_page_id( 'shop' )) . '" class="back-link">Back to All Products</a>';
-}, 20 );
+	echo '<div class="product-back-link top"><a href="' . get_permalink(wc_get_page_id( 'shop' )) . '" class="back-link"><i class="far fa-angle-left"></i> <u>Back to All Products</u></a></div>';
+}, 5 );
+// add_action( 'woocommerce_after_single_product',  function(){
+// 	echo '<div class="product-back-link bottom"><a href="' . get_permalink(wc_get_page_id( 'shop' )) . '" class="back-link"><i class="far fa-angle-left"></i> <u>Back to All Products</u></a></div>';
+// }, 5 );
 
 add_action('init', 'product_mobile');
 function product_mobile(){
@@ -914,3 +922,212 @@ function product_mobile(){
 add_action( 'woocommerce_single_product_summary', function(){
 	the_content();
 }, 20 );
+
+add_filter('woocommerce_dropdown_variation_attribute_options_html', 'wrap_variation_select_with_span', 10, 3);
+function wrap_variation_select_with_span($html, $args) {
+    // Wrap the select element with a span
+    $html = '<span class="variation-select-wrapper">' . $html . '</span>';
+    return $html;
+}
+
+// custom qty input +-
+// add_filter('woocommerce_quantity_input_args', 'custom_quantity_input_args', 10, 2);
+// function custom_quantity_input_args($args, $product) {
+
+//     // Ensure the quantity input has a wrapper for styling
+//     $args['classes'][] = 'custom-quantity-input';
+//     return $args;
+// }
+// custom qty input +-
+// add_filter('woocommerce_quantity_input', 'custom_quantity_input', 10, 3);
+// function custom_quantity_input($args, $product, $echo) {
+// 	error_log('custom_quantity_input');
+//     $defaults = array(
+//         'input_id'     => uniqid('quantity_'),
+//         'input_name'   => 'quantity',
+//         'input_value'  => isset($_POST['quantity']) ? wc_stock_amount(wp_unslash($_POST['quantity'])) : ($product && $product->get_min_purchase_quantity() ? $product->get_min_purchase_quantity() : 1),
+//         'min_value'    => $product && $product->get_min_purchase_quantity() ? $product->get_min_purchase_quantity() : 1,
+//         'max_value'    => $product && $product->get_max_purchase_quantity() ? $product->get_max_purchase_quantity() : '',
+//         'step'         => 1,
+//         'classes'      => array('input-text', 'qty', 'text'),
+//     );
+
+//     $args = wp_parse_args($args, $defaults);
+
+//     $html = '<div>';
+//     $html .= '<button type="button">-</button>';
+//     $html .= sprintf(
+//         '<input type="number" id="%s" class="%s" step="%s" min="%s" max="%s" name="%s" value="%s" title="Qty" size="4" />',
+//         esc_attr($args['input_id']),
+//         esc_attr(implode(' ', $args['classes'])),
+//         esc_attr($args['step']),
+//         esc_attr($args['min_value']),
+//         esc_attr($args['max_value'] ? $args['max_value'] : ''),
+//         esc_attr($args['input_name']),
+//         esc_attr($args['input_value'])
+//     );
+//     $html .= '<button type="button">+</button>';
+//     $html .= '</div>';
+
+//     if ($echo) {
+//         echo $html;
+//         return '';
+//     }
+
+//     return $html;
+// }
+/*************************************************************************************************************************************
+CUSTOM DIMENSIONS
+**************************************************************************************************************************************/
+/*
+add_action('woocommerce_before_add_to_cart_button', 'add_custom_dimension_fields');
+function add_custom_dimension_fields() {
+    global $product;
+
+    // Only display for products where price is per square foot (e.g., check product meta or specific product IDs)
+    // Adjust condition as needed, e.g., check a custom meta field or product ID
+    //if ($product->get_id() === YOUR_PRODUCT_ID) { // Replace YOUR_PRODUCT_ID with actual product ID or condition
+        ?>
+        <div class="custom-dimensions">
+        	<div class="field">
+	            <label for="width">Width (ft):</label>
+	            <input type="number" id="width" name="width" min="0" step="0.01" required>
+            </div>
+        	<div class="field">
+	            <label for="height">Height (ft):</label>
+	            <input type="number" id="height" name="height" min="0" step="0.01" required>
+	        </div>
+            <p class="sqfttotal">Total Area: <span id="square-footage">0</span> sq ft</p>
+        </div>
+        <?php
+    //}
+}
+
+add_action('wp_footer', 'custom_dimension_js');
+function custom_dimension_js() {
+    global $product;
+
+    // Only add JS for the specific product
+    // if (is_product() && $product->get_id() === YOUR_PRODUCT_ID) { // Replace YOUR_PRODUCT_ID
+    if (is_product()) {
+        ?>
+        <script>
+            jQuery(document).ready(function($) {
+                // Get input fields
+                const widthInput = $('#width');
+                const heightInput = $('#height');
+                const squareFootageDisplay = $('#square-footage');
+                const quantityInput = $('input[name="quantity"]');
+
+                quantityInput.val(0);
+                quantityInput.addClass('disabled');
+                quantityInput.attr('disabled','disabled');
+
+                // Function to calculate square footage
+                function calculateSquareFootage() {
+                    const width = parseFloat(widthInput.val()) || 0;
+                    const height = parseFloat(heightInput.val()) || 0;
+                    const squareFootage = width * height;
+
+                    // Update square footage display
+                    squareFootageDisplay.text(squareFootage.toFixed(2));
+
+                    // Update WooCommerce quantity field
+                    quantityInput.val(squareFootage.toFixed(2));
+
+                    // Trigger change event for WooCommerce to update add to cart button
+                    quantityInput.trigger('change');
+                }
+
+                // Bind calculation to input changes
+                widthInput.on('input', calculateSquareFootage);
+                heightInput.on('input', calculateSquareFootage);
+
+                // Initialize calculation
+                calculateSquareFootage();
+            });
+        </script>
+        <?php
+    }
+}
+
+add_filter('woocommerce_add_cart_item_data', 'store_custom_dimension_data', 10, 3);
+function store_custom_dimension_data($cart_item_data, $product_id, $variation_id) {
+    // Only for specific product
+    // if ($product_id === YOUR_PRODUCT_ID) { // Replace YOUR_PRODUCT_ID
+        if (isset($_POST['width']) && isset($_POST['height'])) {
+            $width = floatval($_POST['width']);
+            $height = floatval($_POST['height']);
+            $cart_item_data['custom_dimensions'] = array(
+                'width' => $width,
+                'height' => $height,
+                'square_footage' => $width * $height
+            );
+        }
+    // }
+    return $cart_item_data;
+}
+
+add_filter('woocommerce_get_item_data', 'display_custom_dimension_data', 10, 2);
+function display_custom_dimension_data($item_data, $cart_item) {
+    if (isset($cart_item['custom_dimensions'])) {
+        $item_data[] = array(
+            'key'     => 'Width',
+            'value'   => $cart_item['custom_dimensions']['width'] . ' ft',
+            'display' => ''
+        );
+        $item_data[] = array(
+            'key'     => 'Height',
+            'value'   => $cart_item['custom_dimensions']['height'] . ' ft',
+            'display' => ''
+        );
+        $item_data[] = array(
+            'key'     => 'Square Footage',
+            'value'   => $cart_item['custom_dimensions']['square_footage'] . ' sq ft',
+            'display' => ''
+        );
+    }
+    return $item_data;
+}
+
+add_action('woocommerce_checkout_create_order_line_item', 'save_custom_dimension_order_meta', 10, 4);
+function save_custom_dimension_order_meta($item, $cart_item_key, $values, $order) {
+    if (isset($values['custom_dimensions'])) {
+        $item->add_meta_data('Width', $values['custom_dimensions']['width'] . ' ft');
+        $item->add_meta_data('Height', $values['custom_dimensions']['height'] . ' ft');
+        $item->add_meta_data('Square Footage', $values['custom_dimensions']['square_footage'] . ' sq ft');
+    }
+}
+
+add_filter('woocommerce_add_to_cart_validation', 'validate_custom_dimension_data', 10, 3);
+function validate_custom_dimension_data($passed, $product_id, $quantity) {
+    // if ($product_id === YOUR_PRODUCT_ID) { // Replace YOUR_PRODUCT_ID
+        if (empty($_POST['width']) || empty($_POST['height'])) {
+            wc_add_notice(__('Please enter both width and height.', 'woocommerce'), 'error');
+            return false;
+        }
+        $width = floatval($_POST['width']);
+        $height = floatval($_POST['height']);
+        if ($width <= 0 || $height <= 0) {
+            wc_add_notice(__('Width and height must be greater than zero.', 'woocommerce'), 'error');
+            return false;
+        }
+    // }
+    return $passed;
+}
+
+add_action('woocommerce_before_calculate_totals', 'adjust_cart_item_price', 10, 1);
+function adjust_cart_item_price($cart) {
+    if (is_admin() && !defined('DOING_AJAX')) return;
+
+    foreach ($cart->get_cart() as $cart_item) {
+        if (isset($cart_item['custom_dimensions'])) {
+            $product = $cart_item['data'];
+            $square_footage = $cart_item['custom_dimensions']['square_footage'];
+            // Price per square foot is set in product settings, so quantity handles the total
+            // If needed, you can override the price here
+            // $product->set_price($price_per_square_foot);
+        }
+    }
+}
+*/
