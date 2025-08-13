@@ -5,9 +5,9 @@
 	height: pxem(200);
 	position: relative;
 
-	// @media (max-width: $phablet) {
-	// 	height: 40vw;
-	// }
+	@media (max-width: $phablet) {
+		height: pxem(140);
+	}
 
 	.curve{
 		display: block;

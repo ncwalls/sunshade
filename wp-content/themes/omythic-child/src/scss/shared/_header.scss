@@ -197,9 +197,14 @@
 	top: 0.8em;
 	width: 1.5em;
 
-	// @media (max-width: $phablet) {
-	// 	margin-left: pxem(40);
-	// }
+	@media (max-width: $phablet) {
+		top: 0;
+		transition: top 0.3s;
+
+		.scrolled &{
+			top: 0.3em;
+		}
+	}
 
 	svg{
 		display: block;
