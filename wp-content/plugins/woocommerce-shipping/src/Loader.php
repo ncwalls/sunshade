@@ -95,6 +95,7 @@ use Automattic\WCShipping\Banners\Banners;
 use Automattic\WCShipping\LabelPurchase\EligibilityRESTController;
 use Automattic\WCShipping\Promo\PromoRESTController;
 use Automattic\WCShipping\Promo\PromoService;
+use Automattic\WCShipping\Fulfillments\FulfillmentsService;
 
 use Exception;
 use WC_Connect_API_Client_Local_Test_Mock;
@@ -292,6 +293,11 @@ class Loader {
 	protected $service_object_cache = array();
 
 	protected $wc_connect_base_url;
+
+	/**
+	 * @var AddressNormalizationService
+	 */
+	protected $address_normalization_service;
 
 	/**
 	 * @var ViewService
@@ -903,10 +909,9 @@ class Loader {
 	 * Extend WC Checkout.
 	 */
 	public function extend_checkout() {
-		$address_normalization_service = new AddressNormalizationService( $this->get_service_settings_store(), $this->api_client, $this->get_logger(), new OriginAddressService() );
-		$this->set_checkout_service( new CheckoutService( $address_normalization_service, $this->get_service_settings_store() ) );
+		$this->set_checkout_service( new CheckoutService( $this->address_normalization_service ) );
 
-		new CheckoutController( $this->get_logger(), $this->get_checkout_service(), $this->get_service_settings_store() );
+		new CheckoutController( $this->get_logger(), $this->get_checkout_service(), $this->get_service_settings_store(), $this->address_normalization_service );
 	}
 
 	/**
@@ -967,6 +972,8 @@ class Loader {
 		$this->upsdap_carrier_strategy_service = new UPSDAPCarrierStrategyService( $origin_addresses_service, $api_client );
 		$carrier_strategy_service              = new CarrierStrategyService( $this->upsdap_carrier_strategy_service );
 		$promo_service                         = new PromoService( $schemas_store, $settings_store );
+		$this->address_normalization_service   = new AddressNormalizationService( $settings_store, $api_client, $logger, $origin_addresses_service );
+		$fulfillments_service                  = new FulfillmentsService();
 		$shipping_label                        = new View(
 			$api_client,
 			$settings_store,
@@ -977,7 +984,9 @@ class Loader {
 			$this->view_service,
 			$carrier_strategy_service,
 			$account_settings,
-			$promo_service
+			$promo_service,
+			$this->address_normalization_service,
+			$fulfillments_service
 		);
 
 		$legacy_shipping_label = new WC_Connect_Shipping_Label(
@@ -1316,9 +1325,8 @@ class Loader {
 		$rest_account_settings_controller->register_routes();
 		$origin_addresses_service = new OriginAddressService();
 
-		$address_normalization_service = new AddressNormalizationService( $settings_store, $this->api_client, $logger, $origin_addresses_service );
 		( new AddressRESTController(
-			$address_normalization_service,
+			$this->address_normalization_service,
 			$origin_addresses_service,
 			$this->upsdap_carrier_strategy_service
 		) )->register_routes();
@@ -1331,11 +1339,11 @@ class Loader {
 		);
 		( new PackagesRESTController( $settings_store, $package_settings ) )->register_routes();
 
-		$label_purchase_service = new LabelPurchaseService( $settings_store, $this->api_client, $this->shipping_label, $logger, $this->promo_service );
+		$shipments_service      = new ShipmentsService( $settings_store );
+		$fulfillments_service   = new FulfillmentsService();
+		$label_purchase_service = new LabelPurchaseService( $settings_store, $this->api_client, $this->shipping_label, $logger, $this->promo_service, $fulfillments_service );
 		( new LabelPurchaseRESTController( $label_purchase_service ) )->register_routes();
-
-		$shipments_service = new ShipmentsService( $settings_store );
-		( new ShipmentsRESTController( $shipments_service ) )->register_routes();
+		( new ShipmentsRESTController( $shipments_service, $fulfillments_service ) )->register_routes();
 
 		( new LabelStatusController( $label_purchase_service, $logger ) )->register_routes();
 
@@ -1718,6 +1726,7 @@ class Loader {
 			array(
 				'wcshipping_labels',
 				WC_Connect_Service_Settings_Store::IS_DESTINATION_NORMALIZED_KEY,
+				AddressNormalizationService::DESTINATION_NORMALIZED_HASH_KEY,
 			),
 			true
 		) ) {

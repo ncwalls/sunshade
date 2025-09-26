@@ -1,8 +1,29 @@
 *** WooCommerce Shipping Changelog ***
 
+= 1.8.8 - 2025-09-10 =
+* Tweak - WooCommerce 10.2 Compatibility.
+* Fix   - Packaging slip creation for orders with multiple shipments.
+* Fix   - Broken rendering of shipment sub items in split shipment view for items with variations.
+* Fix   - Shipment item quantity changing in view after extra label is purchased.
+
+
+= 1.8.7 - 2025-09-02 =
+* Add   - Notice to show warnings generated while address verification
+
+= 1.8.6 - 2025-08-27 =
+* Fix   - Retrieval and rendering of created shipments on multi-shipment orders
+
+= 1.8.5 - 2025-08-26 =
+* Fix   - Added data models to ensure consistent formatting of shipment data.
+* Fix   - Simplify the saved shipment object on order meta data.
+
+= 1.8.4 - 2025-08-12 =
+* Fix   - Stop calling update strategies on every page.
+
 = 1.8.3 - 2025-08-04 =
 * Fix   - Printing on Android based browser doesn't work.
 * Fix   - Remove deprecated load_plugin_textdomain() call to fix WordPress.org plugin check.
+* Fix   - Address normalization invalidation after update outside of the shipping modal.
 
 = 1.8.2 - 2025-07-29 =
 * Fix   - Prevent erroneous shipment creation from labels with purchase errors.

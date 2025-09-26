@@ -94,9 +94,7 @@
  * This also overrides the default values in browsers for padding-inline-start
  */
 ul,
-ol,
-ul.has-background,
-ol.has-background {
+ol {
 	padding-left: 40px;
 }
 
@@ -178,4 +176,12 @@ ol.has-background {
 :where(.wp-block-social-links:not(.is-style-logos-only)) .wp-social-link-chain {
 	background-color:#000;
 	color:#fff;
-	}
+}
+
+/**
+ * Override the default overflow-x for the iframe in the editor.
+ * This is needed because we do want allow scrolling on small screens such as mobile devices.
+ */
+.block-editor-iframe__body {
+	overflow-x: auto;
+}

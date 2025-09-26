@@ -31,8 +31,15 @@ class VariationSelector extends AbstractBlock {
 	protected function render( $attributes, $content, $block ): string {
 		global $product;
 
-		if ( $product instanceof \WC_Product && $product->is_type( 'variable' ) ) {
-			return $content;
+		if ( $product instanceof \WC_Product && $product->is_type( 'variable' ) && ! Utils::is_not_purchasable_product( $product ) ) {
+			$p = new \WP_HTML_Tag_Processor( $content );
+
+			if ( $p->next_tag( array( 'class_name' => 'wp-block-woocommerce-add-to-cart-with-options-variation-selector' ) ) ) {
+				$p->set_attribute( 'data-wp-watch', 'callbacks.setSelectedVariationId' );
+				$p->set_attribute( 'data-wp-watch--validate', 'callbacks.validateVariation' );
+			}
+
+			return $p->get_updated_html();
 		}
 
 		return '';

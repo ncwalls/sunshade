@@ -148,21 +148,49 @@
 }
 
 .site-header-menu {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
 	text-align: right;
 
-	@media (max-width : $mobile-nav-breakpoint) {
-		display: none;
-	}
+	// @media (max-width : $mobile-nav-breakpoint) {
+	// 	display: none;
+	// }
 
-	.menu {
-		> li {
-			display: inline-block;
-		}
-	}
 }
 
 #large-nav-primary{
+	margin-right: 3rem;
+
+	@media (max-width: $mobile) {
+		margin-right: 2rem;
+	}
 	
+	.menu {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+
+		> li {
+			display: inline-block;
+		}
+
+		a{
+			color: #fff;
+			// font-size: 2rem;
+			font-weight: 600;
+			text-transform: uppercase;
+
+			&:hover{
+				text-decoration: underline;
+			}
+
+			.scrolled &{
+				color: $brand-blue;
+			}
+		}
+	}
+
 	.menu-item-has-children{
 		position: relative;
 		

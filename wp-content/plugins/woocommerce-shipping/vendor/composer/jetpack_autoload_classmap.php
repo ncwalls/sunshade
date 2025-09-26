@@ -342,6 +342,10 @@ return array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/FeatureFlags/FeatureFlags.php'
 	),
+	'Automattic\\WCShipping\\Fulfillments\\FulfillmentsService' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/src/Fulfillments/FulfillmentsService.php'
+	),
 	'Automattic\\WCShipping\\Integrations\\AssetsRESTController' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/Integrations/AssetsRESTController.php'
@@ -506,6 +510,18 @@ return array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/Shipment/ShipmentFromLabelGenerator.php'
 	),
+	'Automattic\\WCShipping\\Shipments\\Models\\Shipment' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/src/Shipments/Models/Shipment.php'
+	),
+	'Automattic\\WCShipping\\Shipments\\Models\\ShipmentItem' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/src/Shipments/Models/ShipmentItem.php'
+	),
+	'Automattic\\WCShipping\\Shipments\\Models\\Shipments' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/src/Shipments/Models/Shipments.php'
+	),
 	'Automattic\\WCShipping\\Shipments\\ShipmentsRESTController' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/Shipments/ShipmentsRESTController.php'
@@ -550,6 +566,10 @@ return array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/Integrations/ConfigRESTControllerTest.php'
 	),
+	'Automattic\\WCShipping\\Tests\\LabelPurchase\\AddressNormalizationServiceTest' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/tests/php/LabelPurchase/AddressNormalizationServiceTest.php'
+	),
 	'Automattic\\WCShipping\\Tests\\Packages\\PackageRepositoryTest' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/Packages/PackageRepositoryTest.php'
@@ -561,6 +581,10 @@ return array(
 	'Automattic\\WCShipping\\Tests\\Promo\\PromoServiceTest' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/Promo/PromoServiceTest.php'
+	),
+	'Automattic\\WCShipping\\Tests\\Shipments\\Models\\ShipmentItemTest' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/tests/php/Shipments/Models/ShipmentItemTest.php'
 	),
 	'Automattic\\WCShipping\\Tests\\TosRESTControllerTest' => array(
 		'version' => 'dev-trunk',
@@ -585,6 +609,10 @@ return array(
 	'Automattic\\WCShipping\\Tests\\php\\FeatureFlags\\FeatureFlagsTest' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/FeatureFlags/FeatureFlagsTest.php'
+	),
+	'Automattic\\WCShipping\\Tests\\php\\Fulfillments\\FulfillmentsServiceTest' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/tests/php/Fulfillments/FulfillmentsServiceTest.php'
 	),
 	'Automattic\\WCShipping\\Tests\\php\\LabelPurchase\\AddressRESTControllerTest' => array(
 		'version' => 'dev-trunk',
@@ -658,6 +686,10 @@ return array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/LoaderTest.php'
 	),
+	'Automattic\\WCShipping\\Tests\\php\\Utilities\\BaseModelTest' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/tests/php/Utilities/BaseModelTest.php'
+	),
 	'Automattic\\WCShipping\\Tests\\php\\Utils\\ProductCustomsDataTest' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/tests/php/Utils/ProductCustomsDataTest.php'
@@ -681,6 +713,10 @@ return array(
 	'Automattic\\WCShipping\\Utilities\\AddressUtils' => array(
 		'version' => 'dev-trunk',
 		'path'    => $baseDir . '/src/Utilities/AddressUtils.php'
+	),
+	'Automattic\\WCShipping\\Utilities\\BaseModel' => array(
+		'version' => 'dev-trunk',
+		'path'    => $baseDir . '/src/Utilities/BaseModel.php'
 	),
 	'Automattic\\WCShipping\\Utils' => array(
 		'version' => 'dev-trunk',

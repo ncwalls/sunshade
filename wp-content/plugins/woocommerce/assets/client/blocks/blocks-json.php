@@ -555,7 +555,8 @@ return array(
 		'supports' => array(
 			'interactivity' => true
 		),
-		'$schema' => 'https://schemas.wp.org/trunk/block.json'
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'viewScriptModule' => 'woocommerce/add-to-cart-with-options-grouped-product-selector'
 	),
 	'add-to-cart-with-options-quantity-selector' => array(
 		'name' => 'woocommerce/add-to-cart-with-options-quantity-selector',
@@ -598,7 +599,8 @@ return array(
 		'supports' => array(
 			'interactivity' => true
 		),
-		'$schema' => 'https://schemas.wp.org/trunk/block.json'
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'viewScriptModule' => 'woocommerce/add-to-cart-with-options-variation-selector'
 	),
 	'add-to-cart-with-options-variation-selector-attribute' => array(
 		'name' => 'woocommerce/add-to-cart-with-options-variation-selector-attribute',
@@ -724,7 +726,6 @@ return array(
 			'woocommerce/attributeName',
 			'woocommerce/attributeTerms'
 		),
-		'viewScriptModule' => 'woocommerce/add-to-cart-with-options-variation-selector-attribute-options',
 		'style' => 'file:../woocommerce/add-to-cart-with-options-variation-selector-attribute-options-style.css'
 	),
 	'all-products' => array(
@@ -1140,6 +1141,22 @@ return array(
 		'apiVersion' => 3,
 		'$schema' => 'https://schemas.wp.org/trunk/block.json'
 	),
+	'email-content' => array(
+		'name' => 'woocommerce/email-content',
+		'title' => 'Email Content',
+		'description' => 'A placeholder block for email content.',
+		'category' => 'woocommerce',
+		'textdomain' => 'woocommerce',
+		'supports' => array(
+			'inserter' => false,
+			'email' => true
+		),
+		'attributes' => array(
+			
+		),
+		'apiVersion' => 3,
+		'$schema' => 'https://schemas.wp.org/trunk/block.json'
+	),
 	'featured-category' => array(
 		'name' => 'woocommerce/featured-category',
 		'title' => 'Featured Category',
@@ -1500,6 +1517,10 @@ return array(
 			'multiple' => false,
 			'typography' => array(
 				'fontSize' => true
+			),
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true
 			)
 		),
 		'example' => array(
@@ -1554,6 +1575,49 @@ return array(
 			'productCountVisibility' => array(
 				'type' => 'string',
 				'default' => 'greater_than_zero'
+			)
+		),
+		'apiVersion' => 3,
+		'$schema' => 'https://schemas.wp.org/trunk/block.json'
+	),
+	'mini-cart-contents' => array(
+		'name' => 'woocommerce/mini-cart-contents',
+		'version' => '1.0.0',
+		'title' => 'Mini-Cart Contents',
+		'description' => 'Display a Mini-Cart widget.',
+		'category' => 'woocommerce',
+		'supports' => array(
+			'align' => false,
+			'html' => false,
+			'multiple' => false,
+			'reusable' => false,
+			'inserter' => false,
+			'color' => array(
+				'text' => true,
+				'background' => true,
+				'link' => true
+			),
+			'lock' => false,
+			'__experimentalBorder' => array(
+				'color' => true,
+				'width' => true
+			)
+		),
+		'attributes' => array(
+			'isPreview' => array(
+				'type' => 'boolean',
+				'default' => false
+			),
+			'lock' => array(
+				'type' => 'object',
+				'default' => array(
+					'remove' => true,
+					'move' => true
+				)
+			),
+			'width' => array(
+				'type' => 'string',
+				'default' => '480px'
 			)
 		),
 		'apiVersion' => 3,
@@ -2330,6 +2394,33 @@ return array(
 		'apiVersion' => 3,
 		'$schema' => 'https://schemas.wp.org/trunk/block.json'
 	),
+	'payment-method-icons' => array(
+		'name' => 'woocommerce/payment-method-icons',
+		'version' => '1.0.0',
+		'title' => 'Payment Method Icons',
+		'description' => 'Display icons for available payment methods.',
+		'category' => 'woocommerce',
+		'keywords' => array(
+			'woocommerce',
+			'payments',
+			'payment methods'
+		),
+		'textdomain' => 'woocommerce',
+		'attributes' => array(
+			'numberOfIcons' => array(
+				'type' => 'number',
+				'default' => 0
+			)
+		),
+		'supports' => array(
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true
+			)
+		),
+		'apiVersion' => 3,
+		'$schema' => 'https://schemas.wp.org/trunk/block.json'
+	),
 	'price-filter' => array(
 		'name' => 'woocommerce/price-filter',
 		'title' => 'Filter by Price Controls',
@@ -2795,9 +2886,9 @@ return array(
 			'WooCommerce',
 			'Products (Beta)',
 			'all products',
+			'by attribute',
 			'by category',
-			'by tag',
-			'by attribute'
+			'by tag'
 		),
 		'textdomain' => 'woocommerce',
 		'attributes' => array(
@@ -2811,7 +2902,23 @@ return array(
 				'type' => 'string'
 			),
 			'displayLayout' => array(
-				'type' => 'object'
+				'type' => 'object',
+				'properties' => array(
+					'type' => array(
+						'type' => 'string',
+						'enum' => array(
+							'flex',
+							'list',
+							'carousel'
+						)
+					),
+					'columns' => array(
+						'type' => 'number'
+					),
+					'shrinkColumns' => array(
+						'type' => 'boolean'
+					)
+				)
 			),
 			'dimensions' => array(
 				'type' => 'object'
@@ -3012,7 +3119,8 @@ return array(
 		),
 		'attributes' => array(
 			'align' => array(
-				'type' => 'string'
+				'type' => 'string',
+				'default' => 'wide'
 			),
 			'hideTabTitle' => array(
 				'type' => 'boolean',
@@ -3029,7 +3137,7 @@ return array(
 	'product-filter-active' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'name' => 'woocommerce/product-filter-active',
-		'title' => 'Active',
+		'title' => 'Active Filters',
 		'description' => 'Display the currently active filters.',
 		'category' => 'woocommerce',
 		'keywords' => array(
@@ -3073,7 +3181,7 @@ return array(
 	'product-filter-attribute' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'name' => 'woocommerce/product-filter-attribute',
-		'title' => 'Attribute',
+		'title' => 'Attribute Filter',
 		'description' => 'Enable customers to filter the product grid by selecting one or more attributes, such as color.',
 		'category' => 'woocommerce',
 		'keywords' => array(
@@ -3188,6 +3296,7 @@ return array(
 		'ancestor' => array(
 			'woocommerce/product-filter-attribute',
 			'woocommerce/product-filter-status',
+			'woocommerce/product-filter-taxonomy',
 			'woocommerce/product-filter-rating'
 		),
 		'supports' => array(
@@ -3247,6 +3356,7 @@ return array(
 		'apiVersion' => 3,
 		'ancestor' => array(
 			'woocommerce/product-filter-attribute',
+			'woocommerce/product-filter-taxonomy',
 			'woocommerce/product-filter-status'
 		),
 		'supports' => array(
@@ -3323,7 +3433,7 @@ return array(
 	'product-filter-price' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'name' => 'woocommerce/product-filter-price',
-		'title' => 'Price',
+		'title' => 'Price Filter',
 		'description' => 'Let shoppers filter products by choosing a price range.',
 		'category' => 'woocommerce',
 		'keywords' => array(
@@ -3409,7 +3519,7 @@ return array(
 	),
 	'product-filter-rating' => array(
 		'name' => 'woocommerce/product-filter-rating',
-		'title' => 'Rating',
+		'title' => 'Rating Filter',
 		'description' => 'Enable customers to filter the product collection by rating.',
 		'category' => 'woocommerce',
 		'keywords' => array(
@@ -3504,7 +3614,7 @@ return array(
 	),
 	'product-filter-status' => array(
 		'name' => 'woocommerce/product-filter-status',
-		'title' => 'Status',
+		'title' => 'Status Filter',
 		'description' => 'Let shoppers filter products by choosing stock status.',
 		'category' => 'woocommerce',
 		'keywords' => array(
@@ -3582,6 +3692,101 @@ return array(
 		'usesContext' => array(
 			'query',
 			'filterParams'
+		),
+		'example' => array(
+			'attributes' => array(
+				'isPreview' => true
+			)
+		)
+	),
+	'product-filter-taxonomy' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'name' => 'woocommerce/product-filter-taxonomy',
+		'title' => 'Taxonomy Filter',
+		'description' => 'Enable customers to filter the product collection by selecting one or more taxonomy terms, such as categories, brands, or tags.',
+		'category' => 'woocommerce',
+		'keywords' => array(
+			'WooCommerce'
+		),
+		'textdomain' => 'woocommerce',
+		'apiVersion' => 3,
+		'ancestor' => array(
+			'woocommerce/product-filters'
+		),
+		'supports' => array(
+			'interactivity' => true,
+			'color' => array(
+				'text' => true,
+				'background' => false,
+				'__experimentalDefaultControls' => array(
+					'text' => false
+				)
+			),
+			'typography' => array(
+				'fontSize' => true,
+				'lineHeight' => true,
+				'__experimentalFontWeight' => true,
+				'__experimentalFontFamily' => true,
+				'__experimentalFontStyle' => true,
+				'__experimentalTextTransform' => true,
+				'__experimentalTextDecoration' => true,
+				'__experimentalLetterSpacing' => true,
+				'__experimentalDefaultControls' => array(
+					'fontSize' => false
+				)
+			),
+			'spacing' => array(
+				'margin' => true,
+				'padding' => true,
+				'blockGap' => true,
+				'__experimentalDefaultControls' => array(
+					'margin' => false,
+					'padding' => false,
+					'blockGap' => false
+				)
+			),
+			'__experimentalBorder' => array(
+				'color' => true,
+				'radius' => true,
+				'style' => true,
+				'width' => true,
+				'__experimentalDefaultControls' => array(
+					'color' => false,
+					'radius' => false,
+					'style' => false,
+					'width' => false
+				)
+			)
+		),
+		'usesContext' => array(
+			'query',
+			'filterParams'
+		),
+		'attributes' => array(
+			'taxonomy' => array(
+				'type' => 'string',
+				'default' => 'product_cat'
+			),
+			'showCounts' => array(
+				'type' => 'boolean',
+				'default' => false
+			),
+			'displayStyle' => array(
+				'type' => 'string',
+				'default' => 'woocommerce/product-filter-checkbox-list'
+			),
+			'isPreview' => array(
+				'type' => 'boolean',
+				'default' => false
+			),
+			'sortOrder' => array(
+				'type' => 'string',
+				'default' => 'count-desc'
+			),
+			'hideEmpty' => array(
+				'type' => 'boolean',
+				'default' => true
+			)
 		),
 		'example' => array(
 			'attributes' => array(
@@ -3741,7 +3946,7 @@ return array(
 			'WooCommerce'
 		),
 		'usesContext' => array(
-			'postId'
+			'iapi/provider'
 		),
 		'textdomain' => 'woocommerce',
 		'supports' => array(
@@ -3771,11 +3976,13 @@ return array(
 				'radius' => true,
 				'__experimentalSkipSerialization' => true
 			),
-			'__experimentalSelector' => '.wc-block-product-gallery-large-image-next-previous__button'
+			'__experimentalSelector' => '.wc-block-next-previous-buttons__button'
 		),
 		'ancestor' => array(
-			'woocommerce/product-gallery-large-image'
+			'woocommerce/product-gallery-large-image',
+			'woocommerce/product-collection'
 		),
+		'style' => 'file:../woocommerce/product-gallery-large-image-next-previous-style.css',
 		'editorStyle' => 'file:../woocommerce/product-gallery-large-image-next-previous-editor.css'
 	),
 	'product-gallery-thumbnails' => array(
@@ -4659,6 +4866,7 @@ return array(
 			'postType'
 		),
 		'supports' => array(
+			'interactivity' => true,
 			'html' => false,
 			'color' => array(
 				'gradients' => true,
@@ -4701,7 +4909,10 @@ return array(
 			'attributes' => array(
 				'textAlign' => 'center'
 			)
-		)
+		),
+		'viewScriptModule' => 'woocommerce/product-review-form',
+		'style' => 'file:../woocommerce/product-review-form-style.css',
+		'editorStyle' => 'file:../woocommerce/product-review-form-editor.css'
 	),
 	'product-review-rating' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
@@ -5362,9 +5573,7 @@ return array(
 		),
 		'supports' => array(
 			'html' => false,
-			'interactivity' => array(
-				'clientNavigation' => true
-			),
+			'interactivity' => true,
 			'color' => array(
 				'text' => true,
 				'background' => true
@@ -5634,6 +5843,13 @@ return array(
 				'__experimentalDefaultControls' => array(
 					'fontSize' => true
 				)
+			),
+			'layout' => array(
+				'allowEditing' => false,
+				'allowSwitching' => false,
+				'allowInheriting' => false,
+				'allowSizingOnChildren' => false,
+				'allowVerticalAlignment' => false
 			)
 		),
 		'editorStyle' => 'file:../woocommerce/product-template-editor.css',
@@ -6032,11 +6248,12 @@ return array(
 	'single-product' => array(
 		'name' => 'woocommerce/single-product',
 		'icon' => 'info',
-		'title' => 'Single Product',
-		'description' => 'Display a single product.',
+		'title' => 'Product',
+		'description' => 'Display a single product of your choice with full control over its presentation.',
 		'category' => 'woocommerce',
 		'keywords' => array(
-			'WooCommerce'
+			'WooCommerce',
+			'single product'
 		),
 		'supports' => array(
 			'interactivity' => true,
@@ -6183,7 +6400,7 @@ return array(
 			'html' => false,
 			'multiple' => false,
 			'reusable' => false,
-			'inserter' => true
+			'inserter' => false
 		),
 		'parent' => array(
 			'woocommerce/cart-items-block'
@@ -7465,7 +7682,8 @@ return array(
 			'multiple' => false,
 			'reusable' => false,
 			'inserter' => false,
-			'lock' => false
+			'lock' => false,
+			'interactivity' => true
 		),
 		'attributes' => array(
 			'lock' => array(
@@ -7527,7 +7745,8 @@ return array(
 			'multiple' => false,
 			'reusable' => false,
 			'inserter' => false,
-			'lock' => false
+			'lock' => false,
+			'interactivity' => true
 		),
 		'attributes' => array(
 			'lock' => array(
@@ -7560,6 +7779,9 @@ return array(
 			'color' => array(
 				'text' => true,
 				'background' => true
+			),
+			'interactivity' => array(
+				'clientNavigation' => true
 			)
 		),
 		'attributes' => array(
@@ -7569,6 +7791,10 @@ return array(
 					'remove' => false,
 					'move' => false
 				)
+			),
+			'cartButtonLabel' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'styles' => array(
@@ -7604,6 +7830,9 @@ return array(
 			'color' => array(
 				'text' => true,
 				'background' => true
+			),
+			'interactivity' => array(
+				'clientNavigation' => true
 			)
 		),
 		'attributes' => array(
@@ -7613,6 +7842,10 @@ return array(
 					'remove' => false,
 					'move' => false
 				)
+			),
+			'checkoutButtonLabel' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'styles' => array(
@@ -7645,7 +7878,8 @@ return array(
 			'multiple' => false,
 			'reusable' => false,
 			'inserter' => false,
-			'lock' => false
+			'lock' => false,
+			'interactivity' => true
 		),
 		'attributes' => array(
 			'lock' => array(
@@ -7675,7 +7909,10 @@ return array(
 			'multiple' => false,
 			'reusable' => false,
 			'inserter' => false,
-			'lock' => false
+			'lock' => false,
+			'interactivity' => array(
+				'clientNavigation' => true
+			)
 		),
 		'attributes' => array(
 			'lock' => array(
@@ -7705,7 +7942,8 @@ return array(
 			'multiple' => false,
 			'reusable' => false,
 			'inserter' => false,
-			'lock' => false
+			'lock' => false,
+			'interactivity' => true
 		),
 		'attributes' => array(
 			'lock' => array(
@@ -7737,8 +7975,10 @@ return array(
 			'inserter' => true,
 			'color' => array(
 				'text' => true,
-				'background' => true,
-				'__experimentalSkipSerialization' => true
+				'background' => true
+			),
+			'interactivity' => array(
+				'clientNavigation' => true
 			)
 		),
 		'attributes' => array(
@@ -7748,6 +7988,10 @@ return array(
 					'remove' => false,
 					'move' => false
 				)
+			),
+			'startShoppingButtonLabel' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'styles' => array(
@@ -7787,6 +8031,9 @@ return array(
 			),
 			'typography' => array(
 				'fontSize' => true
+			),
+			'interactivity' => array(
+				'clientNavigation' => true
 			)
 		),
 		'attributes' => array(
@@ -7827,7 +8074,8 @@ return array(
 			),
 			'spacing' => array(
 				'padding' => true
-			)
+			),
+			'interactivity' => true
 		),
 		'parent' => array(
 			'woocommerce/mini-cart-title-block'
@@ -7858,11 +8106,15 @@ return array(
 			),
 			'spacing' => array(
 				'padding' => true
+			),
+			'interactivity' => array(
+				'clientNavigation' => true
 			)
 		),
 		'attributes' => array(
 			'label' => array(
-				'type' => 'string'
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'parent' => array(

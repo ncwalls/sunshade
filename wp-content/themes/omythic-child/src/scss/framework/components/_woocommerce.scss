@@ -566,7 +566,7 @@ ul.products{
 					padding-right: 3em;
 					position: relative;
 					white-space: normal;
-					line-height: 1;
+					line-height: 1.4;
 					width: 100%;
 					z-index: 2;
 				}
@@ -788,8 +788,9 @@ ul.products{
 				grid-column-end: 5;
 
 				img{
-					aspect-ratio: 1.15;
-					object-fit: cover;
+					display: block;
+					aspect-ratio: auto;
+					// object-fit: cover;
 				}
 			}
 
@@ -935,7 +936,12 @@ ul.products{
 	.single_add_to_cart_button.button.disabled{
 		background: $brand-grey !important;
 	}
+	#wc-square-digital-wallet{
+		margin-right: 0;
+		margin-left: 0;
+	}
 }
+
 
 .woocommerce span.onsale{
 	background: $brand-red;

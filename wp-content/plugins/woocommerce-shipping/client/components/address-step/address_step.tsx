@@ -108,9 +108,7 @@ export const AddressStep = withBoundary(
 							validatable
 						);
 					}
-					return [ validatable ]
-						.map( validateEmail )
-						.map( validatePhone )[ 0 ];
+					return validatePhone( validatable );
 				} );
 
 			return validatables[ 0 ].errors;
@@ -137,6 +135,13 @@ export const AddressStep = withBoundary(
 			( select ) =>
 				select( addressStore ).getAddressNeedsConfirmation( type ),
 			[ type ]
+		);
+		const warnings = useSelect(
+			( select ) =>
+				select( addressStore ).getAddressVerifcationWarnings(
+					ADDRESS_TYPES.DESTINATION
+				),
+			[]
 		);
 
 		const normalizeAddress = async ( values: T ) => {
@@ -388,6 +393,27 @@ export const AddressStep = withBoundary(
 								confirmAddress={ updateAddress }
 								errors={ validationErrors }
 							></AddressSuggestion>
+							{ !! warnings &&
+								warnings.length > 0 &&
+								warnings.map( ( { code, message } ) => (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+										key={ code }
+									>
+										<Flex align="flex-start">
+											<Icon
+												icon={ warning }
+												fill="#f0b849"
+												style={ {
+													minWidth: '20px',
+													alignSelf: 'center',
+												} }
+											/>
+											<Text>{ message }</Text>
+										</Flex>
+									</Notice>
+								) ) }
 						</Modal>
 					) }
 			</div>

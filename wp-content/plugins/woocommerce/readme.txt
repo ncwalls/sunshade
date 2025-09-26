@@ -4,7 +4,7 @@ Tags: online store, ecommerce, shop, shopping cart, sell online
 Requires at least: 6.7
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 10.0.3
+Stable tag: 10.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -143,9 +143,10 @@ Check out [Frequently Asked Questions](https://woocommerce.com/document/frequent
 = Minimum Requirements =
 
 * PHP 7.4 or greater is required (PHP 8.0 or greater is recommended)
-* MySQL 5.6 or greater, OR MariaDB version 10.1 or greater, is required
-
-Visit the [WooCommerce server requirements documentation](https://woocommerce.com/document/server-requirements/?utm_source=wp%20org%20repo%20listing&utm_content=3.6) for a detailed list of server requirements.
+* MySQL 5.5.5 or greater, OR MariaDB version 10.1 or greater, is required
+* WordPress 6.7 or greater
+* (Recommended) WordPress [memory limit](https://woocommerce.com/document/increasing-the-wordpress-memory-limit/) of 256 MB or greater.
+* (Recommended) [HTTPS](https://woocommerce.com/document/ssl-and-https/) support.
 
 = Automatic installation =
 
@@ -169,11 +170,16 @@ WooCommerce comes with some sample data you can use to see how products look; im
 
 == Changelog ==
 
-= 10.0.4 2025-07-23 =
+= 10.2.1 2025-09-22 =
 
 **WooCommerce**
 
-* Fix - Possible fatal error with Gutenberg 21.2.0, in particular in Analytics reports. [#59846](https://github.com/woocommerce/woocommerce/pull/59846)
+* Fix - Address update script issue where refunded $order may not exist, and disable refunded orders tool. [#61022](https://github.com/woocommerce/woocommerce/pull/61022)
+* Fix - Downgrade Emogrifier dependency to avoid conflict [#60997](https://github.com/woocommerce/woocommerce/pull/60997)
+* Fix - Fix product price display in RTL languages [#61000](https://github.com/woocommerce/woocommerce/pull/61000)
+* Update - Improve template slug recognition in mechanism registering product blocks. Assure compatibility with WordPress 6.9 [#61009](https://github.com/woocommerce/woocommerce/pull/61009)
+* Dev - Replace deprecated core/edit-site methods with core/editor methods [#61009](https://github.com/woocommerce/woocommerce/pull/61009)
+* Dev - Stop relying on deprecated core/edit-site methods [#61009](https://github.com/woocommerce/woocommerce/pull/61009)
 
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce/trunk/changelog.txt).
