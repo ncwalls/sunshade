@@ -1,29 +1,34 @@
 import { MouseEventHandler } from 'react';
 import {
 	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
 	Button,
 	CheckboxControl,
+	ExternalLink,
 	Flex,
 	FlexBlock,
 	Notice,
 } from '@wordpress/components';
 import {
 	createInterpolateElement,
+	createPortal,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useState,
 } from '@wordpress/element';
-import { Link } from '@woocommerce/components';
+import { Link } from 'components/wc';
 import { __, sprintf } from '@wordpress/i18n';
 import { uniq } from 'lodash';
 import {
+	canManagePayments as canManagePaymentsUtil,
 	getAddPaymentMethodURL,
+	getParentIdFromSubItemId,
+	getUPSDAPTosApprovedVersionsFromError,
 	hasPaymentMethod,
 	hasSelectedPaymentMethod,
-	canManagePayments as canManagePaymentsUtil,
-	getParentIdFromSubItemId,
+	mapAddressForRequest,
 } from 'utils';
 import { CreditCardButton } from './credit-card-button';
 import { settingsPageUrl } from '../constants';
@@ -44,10 +49,8 @@ import { LABEL_PURCHASE_STATUS } from 'data/constants';
 import { UPSDAPTos } from 'components/carrier/upsdap/upsdap-tos';
 import apiFetch from '@wordpress/api-fetch';
 import { getCarrierStrategyPath } from 'data/routes';
-import {
-	mapAddressForRequest,
-	getUPSDAPTosApprovedVersionsFromError,
-} from 'utils';
+import Notification from 'components/notification';
+import { MANAGE_PAYMENT_METHODS_URL } from 'components/shipping-settings/constants';
 
 interface PaymentButtonsProps {
 	order: Order;
@@ -62,6 +65,8 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 			currentShipmentId,
 			getShipmentOrigin,
 			isExtraLabelPurchaseValid,
+			getShipmentType,
+			getCurrentShipmentIsReturn,
 		},
 		labels: {
 			selectedLabelSize,
@@ -79,8 +84,12 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 			canPurchase,
 			setAccountCompleteOrder,
 			getAccountCompleteOrder,
+			getNextPaymentMethod,
 		},
+		nextDesign,
 	} = useLabelPurchaseContext();
+	const nextPaymentMethod = getNextPaymentMethod();
+
 	const lastOrderCompleted = getAccountCompleteOrder();
 	const [ errors, setErrors ] = useState< LabelPurchaseError | null >( null );
 	const [ markOrderAsCompleted, setMarkOrderAsCompleted ] =
@@ -130,14 +139,21 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 	}, [ isPurchasing ] );
 
 	const shipmentsCount = Object.keys( shipments ).length;
-	const purchaseButtonLabel =
+	const purchaseButtonLabelDefault =
 		shipmentsCount > 1
 			? sprintf(
 					// translators: %s is the shipment title as Shipment 1/2, Shipment 2/2, etc.
 					__( 'Purchase %s', 'woocommerce-shipping' ),
-					getShipmentTitle( currentShipmentId, shipmentsCount )
+					getShipmentTitle(
+						currentShipmentId,
+						shipmentsCount,
+						getShipmentType( currentShipmentId )
+					)
 			  )
 			: __( 'Purchase label', 'woocommerce-shipping' );
+	const purchaseButtonLabel = nextDesign
+		? __( 'Buy label', 'woocommerce-shipping' )
+		: purchaseButtonLabelDefault;
 
 	const addCardButtonDescription = (
 		onAddCard: MouseEventHandler< HTMLAnchorElement >
@@ -149,14 +165,9 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 			),
 			{
 				a: (
-					<Link
-						onClick={ onAddCard }
-						type="external"
-						href="#"
-						role="button"
-					>
+					<ExternalLink onClick={ onAddCard } href="#" role="button">
 						{ ' ' }
-					</Link>
+					</ExternalLink>
 				),
 			}
 		);
@@ -334,7 +345,6 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 			order_destination_country: order.shipping_address.country,
 			carrier_id: getSelectedRate()?.rate.carrierId,
 			rate: getSelectedRate()?.rate.rate,
-			list_rate: getSelectedRate()?.rate.listRate,
 			retail_rate: getSelectedRate()?.rate.retailRate,
 			service_id: getSelectedRate()?.rate.serviceId,
 		};
@@ -453,7 +463,96 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 		return ! hasMissingPurchase();
 	};
 
-	return (
+	return nextDesign ? (
+		<>
+			{ UPSDAPTosError && (
+				<UPSDAPTos
+					close={ handleUPSDAPTos.close }
+					confirm={ handleUPSDAPTos.confirm }
+					shipmentOrigin={ shipmentOrigin }
+					acceptedVersions={ getUPSDAPTosApprovedVersionsFromError(
+						UPSDAPTosError
+					) }
+					isConfirming={ isTOSConfirming }
+					setIsConfirming={ setIsTOSConfirming }
+				/>
+			) }
+			{ nextPaymentMethod && (
+				<Button
+					variant="primary"
+					disabled={
+						! selectedRate ||
+						isPurchasing ||
+						isFetching ||
+						isUpdatingStatus ||
+						hasPurchasedLabel( false ) ||
+						! shipmentOrigin.isApproved ||
+						( isExtraLabelPurchase() &&
+							! isExtraLabelPurchaseValid() )
+					}
+					onClick={ () => {
+						const rate = getSelectedRate();
+						if ( rate ) {
+							purchaseLabel( rate );
+						}
+					} }
+					isBusy={ isPurchasing }
+					aria-disabled={
+						! selectedRate ||
+						isPurchasing ||
+						isFetching ||
+						hasPurchasedLabel( false ) ||
+						! shipmentOrigin.isApproved ||
+						( isExtraLabelPurchase() &&
+							! isExtraLabelPurchaseValid() )
+					}
+				>
+					{ purchaseButtonLabel }
+				</Button>
+			) }
+			{ ! nextPaymentMethod &&
+				document.getElementById( 'label-purchase-status-notices' ) &&
+				createPortal(
+					<div style={ { marginBottom: '16px' } }>
+						<Notification type="error">
+							{ createInterpolateElement(
+								__(
+									'No payment method selected for this site. Please select a payment method to purchase a label. <a>Manage payment methods</a>',
+									'woocommerce-shipping'
+								),
+								{
+									a: (
+										<ExternalLink
+											href={ MANAGE_PAYMENT_METHODS_URL }
+										>
+											{ __(
+												'Manage payment methods.',
+												'woocommerce-shipping'
+											) }
+										</ExternalLink>
+									),
+								}
+							) }
+						</Notification>
+					</div>,
+					document.getElementById( 'label-purchase-status-notices' )!
+				) }
+			{ errors &&
+				Object.keys( errors ).length > 0 &&
+				createPortal(
+					<Flex className="purchase-label-errors" direction="column">
+						{ errors && Object.keys( errors ).length > 0 && (
+							<Notification type="error">
+								{ uniq( errors.message ).map( ( m, index ) => (
+									<Text key={ index }>{ m }</Text>
+								) ) }
+							</Notification>
+						) }
+					</Flex>,
+					document.getElementById( 'label-purchase-status-notices' )!
+				) }
+		</>
+	) : (
 		<>
 			{ UPSDAPTosError && (
 				<UPSDAPTos
@@ -507,7 +606,8 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 							<EssentialDetails />
 						</FlexBlock>
 						{ ! hasPurchasedLabel( false ) &&
-							! isOrderCompleted && (
+							! isOrderCompleted &&
+							! getCurrentShipmentIsReturn() && (
 								<Flex>
 									<CheckboxControl
 										label={ __(
@@ -576,6 +676,7 @@ export const PaymentButtons = ( { order }: PaymentButtonsProps ) => {
 						</>
 					) }
 			</Flex>
+
 			<Spacer />
 			{ errors && Object.keys( errors ).length > 0 && (
 				<Notice

@@ -1,5 +1,6 @@
 export * from './common';
 export * from './config';
+export * from './config-sync';
 export * from './location';
 export * from './order';
 export * from './packages';

@@ -2,17 +2,19 @@
 
 	<?php while( have_posts() ): the_post(); ?>
 		<article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
+
 			
 			<?php if($hero = get_field('hero')): ?>
 				<div class="hero">
 					<?php
 						$hero_type = $hero['type'];
 						
-						// $popup_video_type = $hero['popup_type'];
-						// $popup_video_embed_url = $hero['popup_video_embed'];
-						// $popup_video_file = $hero['popup_video_file'];
-						// $popup_video_url = false;
-						// $popup_video_action = '';
+						$popup_video_type = $hero['popup_type'];
+						$popup_video_embed_url = $hero['popup_video_embed'];
+						$popup_video_file = $hero['popup_video_file'];
+						$popup_button_label = $hero['popup_button_label'];
+						$popup_video_url = false;
+						$popup_video_action = '';
 					?>
 					
 					<?php if($hero_type == 'image' && $hero['image']): ?>
@@ -30,7 +32,7 @@
 					<?php elseif($hero_type == 'video_file' && $hero['video_file']): ?>
 						<div class="hero-video">
 							<?php $video_url = $hero['video_file']['url']; ?>
-							<video src="<?php echo $video_url; ?>" poster="<?php //echo $hero_bg; ?>" autoplay muted loop playsinline ></video>
+							<video id="hero-video" src="<?php echo $video_url; ?>" poster="<?php //echo $hero_bg; ?>" autoplay muted loop playsinline webkit-playsinline preload="auto" ></video>
 						</div>
 
 					<?php elseif($hero_type == 'video_embed' && $hero['video_embed']): ?>
@@ -105,28 +107,28 @@
 									<?php endif; ?>
 								</p>
 							<?php endif; ?>
+							<?php if($popup_video_type == 'file' && $popup_video_file): ?>
+								<a href="#hero-video-modal-container" class="hero-play no-scroll" data-action="hero-popup-play">
+									<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50.8 50.8" style="enable-background:new 0 0 50.8 50.8;" xml:space="preserve">
+										<path d="M35.9,26.5l-8,4.6l-8,4.6c-1.1,0.6-1.9,0.1-1.9-1.1v-9.2v-9.2c0-1.2,0.9-1.7,1.9-1.1l8,4.6l8,4.6C37,24.9,37,25.9,35.9,26.5
+												 M25.4,0C11.4,0,0,11.4,0,25.4c0,14,11.4,25.4,25.4,25.4c14,0,25.4-11.4,25.4-25.4C50.8,11.4,39.5,0,25.4,0"/>
+									</svg>
+									<span><?php echo $popup_button_label; ?></span>
+								</a>
+							<?php elseif($popup_video_type == 'embed' && $popup_video_embed_url): ?>
+								<a href="<?php echo $popup_video_embed_url; ?>" class="hero-play no-scroll" data-action="hero-popup-embed">
+									<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50.8 50.8" style="enable-background:new 0 0 50.8 50.8;" xml:space="preserve">
+										<path d="M35.9,26.5l-8,4.6l-8,4.6c-1.1,0.6-1.9,0.1-1.9-1.1v-9.2v-9.2c0-1.2,0.9-1.7,1.9-1.1l8,4.6l8,4.6C37,24.9,37,25.9,35.9,26.5
+										 M25.4,0C11.4,0,0,11.4,0,25.4c0,14,11.4,25.4,25.4,25.4c14,0,25.4-11.4,25.4-25.4C50.8,11.4,39.5,0,25.4,0"/>
+									</svg>
+									<span><?php echo $popup_button_label; ?></span>
+								</a>
+							<?php endif; ?>
 						</div>
-						<?php /*if($popup_video_type == 'file' && $popup_video_file): ?>
-							<a href="#hero-video-modal-container" class="hero-play no-scroll" data-action="hero-popup-play">
-								<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50.8 50.8" style="enable-background:new 0 0 50.8 50.8;" xml:space="preserve">
-									<path d="M35.9,26.5l-8,4.6l-8,4.6c-1.1,0.6-1.9,0.1-1.9-1.1v-9.2v-9.2c0-1.2,0.9-1.7,1.9-1.1l8,4.6l8,4.6C37,24.9,37,25.9,35.9,26.5
-											 M25.4,0C11.4,0,0,11.4,0,25.4c0,14,11.4,25.4,25.4,25.4c14,0,25.4-11.4,25.4-25.4C50.8,11.4,39.5,0,25.4,0"/>
-								</svg>
-								<span>Play Full Video</span>
-							</a>
-						<?php elseif($popup_video_type == 'embed' && $popup_video_embed_url): ?>
-							<a href="<?php echo $popup_video_embed_url; ?>" class="hero-play no-scroll" data-action="hero-popup-embed">
-								<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50.8 50.8" style="enable-background:new 0 0 50.8 50.8;" xml:space="preserve">
-									<path d="M35.9,26.5l-8,4.6l-8,4.6c-1.1,0.6-1.9,0.1-1.9-1.1v-9.2v-9.2c0-1.2,0.9-1.7,1.9-1.1l8,4.6l8,4.6C37,24.9,37,25.9,35.9,26.5
-									 M25.4,0C11.4,0,0,11.4,0,25.4c0,14,11.4,25.4,25.4,25.4c14,0,25.4-11.4,25.4-25.4C50.8,11.4,39.5,0,25.4,0"/>
-								</svg>
-								<span>Play Full Video</span>
-							</a>
-						<?php endif;*/ ?>
 					</div>
 				</div>
 
-				<?php /*if($popup_video_type == 'file' && $popup_video_file): ?>
+				<?php if($popup_video_type == 'file' && $popup_video_file): ?>
 					<div class="video-outer-wrap" id="hero-video-modal-container">
 						<div class="video-container">
 							<?php if($popup_video_type == 'file' && $popup_video_file): ?>
@@ -134,7 +136,7 @@
 							<?php endif; ?>
 						</div>
 					</div>
-				<?php endif;*/ ?>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if($intro = get_field('intro')): ?>

@@ -16,6 +16,24 @@
 	};
 
 	var heroVideo = function() {
+		document.addEventListener('DOMContentLoaded', function () {
+			var video = document.getElementById('hero-video');
+			if (!video.length) {
+				return;
+			}
+
+			video.muted = true;
+
+			var playPromise = video.play();
+
+			if (playPromise !== undefined) {
+				playPromise.then(function () {
+					// autoplay started
+				}).catch(function () {
+					// autoplay was blocked
+				});
+			}
+		});
 
 		$('[data-action="hero-popup-play"]').on('click', function(e) {
 			e.preventDefault();
@@ -341,10 +359,10 @@
 		productDetail();
 	});
 
-    window.addEventListener('load', function() {
-        var videoContainer = $('.hero-video-container');
-        videoContainer.addClass('vis');
-    }, false);
+    // window.addEventListener('load', function() {
+    //     var videoContainer = $('.hero-video-container');
+    //     videoContainer.addClass('vis');
+    // }, false);
 
 })(jQuery);
 

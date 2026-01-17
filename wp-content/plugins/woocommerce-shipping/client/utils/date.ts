@@ -1,6 +1,5 @@
 import { getDate, getSettings } from '@wordpress/date';
-import { __ } from '@wordpress/i18n';
-import { sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 const DATE_FORMAT_OPTIONS = { month: 'long', day: 'numeric' } as const;
 

@@ -5,7 +5,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Link } from '@woocommerce/components';
+import { Link } from 'components/wc';
 import { createInterpolateElement } from '@wordpress/element';
 import { withBoundary } from 'components/HOC';
 import { LABEL_PURCHASE_STATUS } from 'data/constants';

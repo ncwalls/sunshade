@@ -15,7 +15,12 @@ import {
 	RateExtraOptionValue,
 	RateExtraOptions,
 } from 'types';
-import { getAccountSettings, getCurrentOrder, setAccountSettings } from 'utils';
+import {
+	applyPromo,
+	getAccountSettings,
+	getCurrentOrder,
+	setAccountSettings,
+} from 'utils';
 import { labelPurchaseStore } from 'data/label-purchase';
 import { CUSTOM_BOX_ID_PREFIX, CUSTOM_PACKAGE_TYPES } from '../packages';
 import type { usePackageState } from './packages';
@@ -28,7 +33,6 @@ import {
 } from 'data/label-purchase/action-types';
 import { LABEL_RATE_TYPE } from 'data/constants';
 import { DELIVERY_PROPERTIES, SORT_BY } from '../shipping-service/constants';
-import { applyPromo } from 'utils';
 
 interface UseRatesStateProps {
 	currentShipmentId: string;
@@ -44,6 +48,9 @@ interface UseRatesStateProps {
 	getShipmentOrigin: ReturnType<
 		typeof useShipmentState
 	>[ 'getShipmentOrigin' ];
+	getCurrentShipmentIsReturn: ReturnType<
+		typeof useShipmentState
+	>[ 'getCurrentShipmentIsReturn' ];
 	getCurrentShipmentDate: ReturnType<
 		typeof useShipmentState
 	>[ 'getCurrentShipmentDate' ];
@@ -143,6 +150,7 @@ export function useRatesState( {
 	totalWeight,
 	customs: { maybeApplyCustomsToPackage },
 	getShipmentOrigin,
+	getCurrentShipmentIsReturn,
 	getCurrentShipmentDate,
 }: UseRatesStateProps ) {
 	const accountSettings = useMemo( getAccountSettings, [] );
@@ -375,6 +383,7 @@ export function useRatesState( {
 				],
 				orderId: getCurrentOrder().id,
 				origin: getShipmentOrigin(),
+				is_return: getCurrentShipmentIsReturn(),
 				shipment_options: {
 					label_date:
 						getCurrentShipmentDate()?.shippingDate?.toISOString(),
@@ -432,6 +441,7 @@ export function useRatesState( {
 			maybeApplyCustomsToPackage,
 			applyHazmatToPackage,
 			getShipmentOrigin,
+			getCurrentShipmentIsReturn,
 			preselectRateBasedOnLastSelections,
 			getCurrentShipmentDate,
 		]
@@ -502,7 +512,7 @@ export function useRatesState( {
 
 			// Always put MediaMail at the bottom of the list.
 			const mediaMailRate = sortedRates.find(
-				( rate ) => rate && rate.serviceId === 'MediaMail'
+				( rate ) => rate?.serviceId === 'MediaMail'
 			);
 			if ( mediaMailRate ) {
 				const filteredRates = sortedRates.filter(

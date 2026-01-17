@@ -176,7 +176,10 @@ export const mockUtils = ( overrides?: object ) => {
 		getPurchasedLabels: () => ( {
 			0: null,
 		} ),
-		getSelectedRates: () => null,
+		getSelectedRates: () => ( {
+			'0': { rate: { isReturn: false } },
+			'1': { rate: { isReturn: true } },
+		} ),
 		getSelectedHazmat: () => null,
 		getOriginAddresses: jest.fn().mockReturnValue( [ address ] ),
 		getFirstSelectableOriginAddress: () => ( {} ),

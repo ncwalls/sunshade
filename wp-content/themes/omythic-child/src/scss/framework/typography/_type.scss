@@ -70,6 +70,10 @@ address {
 		th,td{
 			border: 1px solid rgba(#000, 0.2);
 			padding: 0.5em;
+
+			.woocommerce-page &{
+				border: 0;
+			}
 		}
 	}
 

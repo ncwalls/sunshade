@@ -15,6 +15,7 @@ use Automattic\WCShipping\Promo\PromoService;
 use Automattic\WCShipping\Fulfillments\FulfillmentsService;
 use Automattic\WCShipping\Utils;
 use Automattic\WCShipping\Shipments\ShipmentsService;
+use Automattic\WCShipping\Fulfillments\ShippingFulfillment;
 use WP_Error;
 
 /**
@@ -112,6 +113,12 @@ class LabelPurchaseService {
 	 * @var string
 	 */
 	const SHIPMENT_DATES = '_wcshipping_shipment_dates';
+	/**
+	 * Key used to store package dimensions in order meta.
+	 *
+	 * @var string
+	 */
+	const PACKAGE_DIMENSIONS = '_wcshipping_package_dimensions';
 
 	/**
 	 * Class constructor.
@@ -168,17 +175,19 @@ class LabelPurchaseService {
 	/**
 	 * Purchase labels for order.
 	 *
-	 * @param array $origin      Origin address.
-	 * @param array $destination Destination address.
-	 * @param array $packages   Packages to purchase labels for.
-	 * @param int   $order_id    WC Order ID.
-	 * @param array $selected_rate Selected rate. { rate: array, parent?: array }
-	 * @param array $selected_rate_options Selected rate options.
-	 * @param array $hazmat Selected HAZMAT category and if shipment includes HAZMAT.
-	 * @param array $customs Customs form information.
-	 * @param array $user_meta User meta array.
-	 * @param array $features_supported_by_client Features supported by client.
-	 * @param array $shipment_options Extra options.
+	 * @param array  $origin      Origin address.
+	 * @param array  $destination Destination address.
+	 * @param array  $packages   Packages to purchase labels for.
+	 * @param int    $order_id    WC Order ID.
+	 * @param array  $selected_rate Selected rate. { rate: array, parent?: array }
+	 * @param array  $selected_rate_options Selected rate options.
+	 * @param array  $hazmat Selected HAZMAT category and if shipment includes HAZMAT.
+	 * @param array  $customs Customs form information.
+	 * @param array  $user_meta User meta array.
+	 * @param array  $features_supported_by_client Features supported by client.
+	 * @param array  $shipment_options Extra options.
+	 * @param bool   $is_return Whether this is a return shipment.
+	 * @param string $parent_shipment_id For return shipments: which shipment ID this is a return for.
 	 * @return array|WP_Error REST response body.
 	 */
 	public function purchase_labels(
@@ -192,7 +201,9 @@ class LabelPurchaseService {
 		$customs,
 		$user_meta = array(),
 		$features_supported_by_client = array(),
-		$shipment_options = array()
+		$shipment_options = array(),
+		$is_return = false,
+		$parent_shipment_id = null
 	) {
 		$settings         = $this->settings_store->get_account_settings();
 		$service_names    = array_column( $packages, 'service_name' );
@@ -203,7 +214,12 @@ class LabelPurchaseService {
 		}
 
 		if ( Utils::should_use_fulfillment_api() ) {
-			$this->fulfillments_service->ensure_order_has_fulfillment( $order_id );
+			$fulfillment = $this->fulfillments_service->ensure_order_has_fulfillment( $order_id );
+			// If there is only one fulfillment, we can use it directly
+			if ( is_array( $fulfillment ) && count( $fulfillment ) === 1 ) {
+				$fulfillment = $fulfillment[0];
+			}
+			// Todo: Take care of cases where there are multiple fulfillments.
 		} else {
 			/**
 			 * Ensure the order has shipments.
@@ -242,6 +258,7 @@ class LabelPurchaseService {
 				'shipment_options'             => array(
 					'label_date' => $label_date,
 				),
+				'is_return'                    => $is_return,
 			)
 		);
 
@@ -259,18 +276,122 @@ class LabelPurchaseService {
 			return $error;
 		}
 
-		if ( Utils::should_use_fulfillment_api() ) {
-			// Todo: WOOSHIP-1595 - set fulfillment status to fulfilled
-		}
-
-		$purchased_labels_meta = $this->get_labels_meta_from_response( $label_response, $request_packages, $service_names, $order_id );
+		$purchased_labels_meta = $this->get_labels_meta_from_response( $label_response, $request_packages, $service_names, $order_id, $parent_shipment_id );
 
 		if ( is_wp_error( $purchased_labels_meta ) ) {
 			$this->logger->log( $purchased_labels_meta, __CLASS__ );
 			return $purchased_labels_meta;
 		}
 
-		$this->settings_store->add_labels_to_order( $order_id, $purchased_labels_meta );
+		$selected_rate = array(
+			'rate'             => array_merge(
+				(array) $label_response->rates[0],
+				array(
+					'type' => $selected_rate['rate']['type'] ?? '',
+				)
+			),
+			'parent'           => isset( $selected_rate['parent'] ) ? (array) $selected_rate['parent'] : null,
+			'shipment_options' => $selected_rate_options,
+		);
+
+		$origin_address = array_merge(
+			$origin,
+			array(
+				'id'          => $origin_address_id,
+				'is_verified' => $is_origin_address_verified,
+			),
+		);
+
+		$shipment_dates = array(
+			'shipping_date'           => $label_date,
+			'estimated_delivery_date' => null, // Coming soon
+		);
+
+		$hazmat_data = array_values( $hazmat )[0];
+
+		$customs_data = array_values( $customs )[0];
+
+		if ( Utils::should_use_fulfillment_api() && $fulfillment ) {
+			return $this->store_purchased_label_to_fulfillment(
+				$fulfillment,
+				$purchased_labels_meta,
+				$selected_rate,
+				$hazmat_data,
+				$origin_address,
+				$destination,
+				$customs_data,
+				$shipment_dates
+			);
+		} else {
+			$this->settings_store->add_labels_to_order( $order_id, $purchased_labels_meta );
+		}
+
+		// Trigger email notification for return labels.
+		if ( $is_return ) {
+			foreach ( $purchased_labels_meta as $label_meta ) {
+				if ( ! empty( $label_meta['is_return'] ) && $label_meta['is_return'] ) {
+					$attachments = array();
+
+					// Try to get the PDF for attachment only if label is completed.
+					if ( ! empty( $label_meta['label_id'] ) ) {
+						// Check if label is ready (not in progress).
+						if ( isset( $label_meta['status'] ) && 'PURCHASE_IN_PROGRESS' === $label_meta['status'] ) {
+							// Schedule the email to be sent later when label is ready.
+							if ( function_exists( 'as_schedule_single_action' ) ) {
+								as_schedule_single_action(
+									time() + 60, // Try again in 1 minute
+									'wcshipping_send_return_label_email_delayed',
+									array( $order_id, $label_meta ),
+									'wcshipping'
+								);
+							} else {
+								// Fallback to WP cron if Action Scheduler not available.
+								wp_schedule_single_event(
+									time() + 60,
+									'wcshipping_send_return_label_email_delayed',
+									array( $order_id, $label_meta )
+								);
+							}
+						} else {
+							// Label should be ready, try to get PDF.
+							$pdf_attachment = $this->get_label_pdf_for_email( $label_meta['label_id'], $order_id );
+							if ( ! is_wp_error( $pdf_attachment ) && ! empty( $pdf_attachment ) ) {
+								$attachments[] = $pdf_attachment;
+							}
+						}
+					}
+
+					// Only send email now if label is not in progress.
+					if ( ! isset( $label_meta['status'] ) || 'PURCHASE_IN_PROGRESS' !== $label_meta['status'] ) {
+						/**
+						 * Trigger return label email notification.
+						 *
+						 * @param int   $order_id The order ID.
+						 * @param array $label_meta The label metadata.
+						 * @param array $attachments Optional attachments.
+						 */
+						do_action( 'wcshipping_return_label_created', $order_id, $label_meta, $attachments );
+					}
+
+					// Don't clean up immediately - let the email system handle the file first.
+					// Schedule cleanup for later.
+					if ( ! empty( $attachments ) ) {
+						foreach ( $attachments as $attachment ) {
+							if ( function_exists( 'as_schedule_single_action' ) ) {
+								as_schedule_single_action(
+									time() + 300, // 5 minutes
+									'wcshipping_cleanup_temp_file',
+									array( $attachment ),
+									'wcshipping'
+								);
+							} else {
+								wp_schedule_single_event( time() + 300, 'wcshipping_cleanup_temp_file', array( $attachment ) );
+							}
+						}
+					}
+				}
+			}
+		}
 
 		/**
 		 * $hazmat looks like this:
@@ -287,30 +408,46 @@ class LabelPurchaseService {
 		$shipment_key = array_keys( $hazmat )[0];
 
 		$keyed_selected_rate = array(
-			$shipment_key => array(
-				'rate'             => array_merge(
-					(array) $label_response->rates[0],
-					array(
-						'type' => $selected_rate['rate']['type'] ?? '',
-					)
-				),
-				'parent'           => isset( $selected_rate['parent'] ) ? (array) $selected_rate['parent'] : null,
-				'shipment_options' => $selected_rate_options,
-			),
+			$shipment_key => $selected_rate,
 		);
 
 		$origin      = array(
-			$shipment_key => array_merge(
-				$origin,
-				array(
-					'id'          => $origin_address_id,
-					'is_verified' => $is_origin_address_verified,
-				),
-			),
+			$shipment_key => $origin_address,
 		);
 		$destination = array(
 			$shipment_key => $destination,
 		);
+
+		// Extract package dimensions for storage
+		$package_dimensions = array();
+		foreach ( $packages as $index => $package ) {
+			$dimensions_data = array();
+
+			if ( isset( $package['weight'] ) ) {
+				$dimensions_data['package_weight']      = $package['weight'];
+				$dimensions_data['package_weight_unit'] = 'oz'; // WooCommerce Shipping uses oz
+			}
+
+			if ( isset( $package['length'] ) ) {
+				$dimensions_data['package_length'] = $package['length'];
+			}
+
+			if ( isset( $package['width'] ) ) {
+				$dimensions_data['package_width'] = $package['width'];
+			}
+
+			if ( isset( $package['height'] ) ) {
+				$dimensions_data['package_height'] = $package['height'];
+			}
+
+			if ( isset( $package['length'] ) || isset( $package['width'] ) || isset( $package['height'] ) ) {
+				$dimensions_data['package_dimensions_unit'] = 'in'; // WooCommerce Shipping uses inches
+			}
+
+			if ( ! empty( $dimensions_data ) ) {
+				$package_dimensions[ $index ] = $dimensions_data;
+			}
+		}
 
 		$selected_meta = $this->store_selected_meta(
 			$order_id,
@@ -320,11 +457,9 @@ class LabelPurchaseService {
 				self::SELECTED_ORIGIN_KEY      => $origin,
 				self::SELECTED_DESTINATION_KEY => $destination,
 				self::CUSTOMS_INFORMATION      => $customs,
-				self::SHIPMENT_DATES           => array(
-					$shipment_key => array(
-						'shipping_date'           => $label_date,
-						'estimated_delivery_date' => null, // Coming soon
-					),
+				self::SHIPMENT_DATES           => array( $shipment_key => $shipment_dates ),
+				self::PACKAGE_DIMENSIONS       => array(
+					$shipment_key => $package_dimensions,
 				),
 			),
 		);
@@ -337,6 +472,7 @@ class LabelPurchaseService {
 			'selected_destination' => $selected_meta[ self::SELECTED_DESTINATION_KEY ],
 			'customs_information'  => $selected_meta[ self::CUSTOMS_INFORMATION ],
 			'shipment_dates'       => $selected_meta[ self::SHIPMENT_DATES ],
+			'package_dimensions'   => $selected_meta[ self::PACKAGE_DIMENSIONS ],
 			'success'              => true,
 		);
 	}
@@ -344,17 +480,19 @@ class LabelPurchaseService {
 	/**
 	 * Returns meta object for purchased labels to store with order.
 	 *
-	 * @param object $response      Purchase shipping label response from Connect Server.
-	 * @param array  $packages     Packages for purchase label request body.
-	 * @param array  $service_names List of service names for packages.
-	 * @param int    $order_id      WooCommerce order ID.
+	 * @param object $response           Purchase shipping label response from Connect Server.
+	 * @param array  $packages          Packages for purchase label request body.
+	 * @param array  $service_names     List of service names for packages.
+	 * @param int    $order_id           WooCommerce order ID.
+	 * @param string $parent_shipment_id For return labels: which shipment this is a return for.
 	 * @return array|WP_Error Meta for purchased labels.
 	 */
-	private function get_labels_meta_from_response( $response, $packages, $service_names, $order_id ) {
+	private function get_labels_meta_from_response( $response, $packages, $service_names, $order_id, $parent_shipment_id = null ) {
 		$label_ids             = array();
 		$purchased_labels_meta = array();
 		$package_lookup        = $this->settings_store->get_package_lookup();
 		foreach ( $response->labels as $index => $label_data ) {
+
 			if ( isset( $label_data->error ) ) {
 				$error = new WP_Error(
 					$label_data->error->code,
@@ -396,6 +534,7 @@ class LabelPurchaseService {
 				'carrier_id'             => $label_data->label->carrier_id,
 				'service_name'           => $service_names[ $index ],
 				'status'                 => $label_data->label->status,
+				'is_return'              => $label_data->label->is_return ?? false,
 				'commercial_invoice_url' => $label_data->label->commercial_invoice_url ?? '',
 				'is_commercial_invoice_submitted_electronically' => $label_data->label->is_commercial_invoice_submitted_electronically ?? '',
 			);
@@ -411,9 +550,8 @@ class LabelPurchaseService {
 			}
 
 			$label_meta['is_letter'] = isset( $package['is_letter'] ) ? $package['is_letter'] : false;
-
-			$product_names = array();
-			$product_ids   = array();
+			$product_names           = array();
+			$product_ids             = array();
 			foreach ( $package['products'] as $product_id ) {
 				$product       = \wc_get_product( $product_id );
 				$product_ids[] = $product_id;
@@ -429,6 +567,11 @@ class LabelPurchaseService {
 			$label_meta['product_names'] = $product_names;
 			$label_meta['product_ids']   = $product_ids;
 			$label_meta['id']            = $package['id']; // internal shipment id.
+
+			// Store parent shipment ID for return labels
+			if ( null !== $parent_shipment_id && '' !== $parent_shipment_id ) {
+				$label_meta['parent_shipment_id'] = $parent_shipment_id;
+			}
 
 			array_unshift( $purchased_labels_meta, $label_meta );
 		}
@@ -544,7 +687,6 @@ class LabelPurchaseService {
 		}
 
 		if ( is_wp_error( $response ) ) {
-			$this->logger->log( $response, __CLASS__ );
 			return $response;
 		}
 
@@ -622,5 +764,195 @@ class LabelPurchaseService {
 				$order->save();
 			}
 		}
+	}
+
+	/**
+	 * Get label PDF as a temporary file for email attachment.
+	 *
+	 * @param int $label_id The label ID.
+	 * @param int $order_id The order ID.
+	 * @return string|WP_Error Path to temporary PDF file or error.
+	 */
+	private function get_label_pdf_for_email( $label_id, $order_id ) {
+		// Get paper size with fallback.
+		$paper_size = $this->settings_store->get_preferred_paper_size();
+		if ( empty( $paper_size ) ) {
+			$paper_size = 'letter'; // Default fallback.
+		}
+
+		// Prepare parameters for PDF request.
+		$params = array(
+			'paper_size' => $paper_size,
+			'labels'     => array(
+				array(
+					'label_id' => intval( $label_id ),
+				),
+			),
+		);
+
+		// Get PDF from API.
+		$response = $this->api_client->get_labels_print_pdf( $params );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		// Check if response has the expected format.
+		if ( ! is_array( $response ) ) {
+			return new WP_Error( 'invalid_pdf_response', __( 'Invalid PDF response format', 'woocommerce-shipping' ) );
+		}
+
+		// Extract the body from the response.
+		$pdf_data = wp_remote_retrieve_body( $response );
+
+		// Check if body contains PDF data.
+		if ( empty( $pdf_data ) || substr( $pdf_data, 0, 4 ) !== '%PDF' ) {
+			return new WP_Error( 'invalid_pdf_data', __( 'Response does not contain valid PDF data', 'woocommerce-shipping' ) );
+		}
+
+		// Create temporary file.
+		$upload_dir = wp_upload_dir();
+		$temp_dir   = trailingslashit( $upload_dir['basedir'] ) . 'wcshipping_temp/';
+
+		// Create temp directory if it doesn't exist.
+		if ( ! file_exists( $temp_dir ) ) {
+			wp_mkdir_p( $temp_dir );
+		}
+
+		// Generate filename.
+		$filename = sprintf( 'return-label-order-%d-label-%d.pdf', $order_id, $label_id );
+		$filepath = $temp_dir . $filename;
+
+		// Save PDF to temporary file.
+		$result = file_put_contents( $filepath, $pdf_data );
+
+		if ( false === $result ) {
+			return new WP_Error( 'pdf_save_error', __( 'Failed to save PDF file', 'woocommerce-shipping' ) );
+		}
+
+		return $filepath;
+	}
+
+	/**
+	 * Store purchased label data to fulfillment.
+	 *
+	 * @param ShippingFulfillment $fulfillment Fulfillment object instance.
+	 * @param array               $purchased_labels_meta Array of purchased label metadata.
+	 *                            Structure: [
+	 *                                [
+	 *                                    'label_id' => string,
+	 *                                    'tracking' => string,
+	 *                                    'refundable_amount' => float,
+	 *                                    'created' => string (timestamp),
+	 *                                    'carrier_id' => string,
+	 *                                    'service_name' => string,
+	 *                                    'status' => string,
+	 *                                    'commercial_invoice_url' => string,
+	 *                                    'is_commercial_invoice_submitted_electronically' => bool,
+	 *                                    'package_name' => string,
+	 *                                    'is_letter' => bool,
+	 *                                    'product_names' => array of strings,
+	 *                                    'product_ids' => array of integers,
+	 *                                    'id' => string (internal shipment id)
+	 *                                ],
+	 *                                ...
+	 *                            ]
+	 * @param array               $selected_rate Selected shipping rate data.
+	 *                            Structure: [
+	 *                                'rate' => [
+	 *                                    'id' => string,
+	 *                                    'carrier_id' => string,
+	 *                                    'service_id' => string,
+	 *                                    'rate' => float,
+	 *                                    'currency' => string,
+	 *                                    'type' => string,
+	 *                                    ...additional rate properties from API response
+	 *                                ],
+	 *                                'parent' => array|null (parent rate data if applicable),
+	 *                                'shipment_options' => array (selected rate options)
+	 *                            ]
+	 * @param array               $hazmat_config HAZMAT configuration.
+	 *                            Structure: [
+	 *                                'category' => string (HAZMAT category),
+	 *                                'is_hazmat' => string ('true'|'false')
+	 *                            ]
+	 * @param array               $origin_address Origin address data.
+	 *                            Structure: [
+	 *                                'id' => string (address ID),
+	 *                                'is_verified' => bool,
+	 *                                'name' => string,
+	 *                                'company' => string,
+	 *                                'address' => string,
+	 *                                'address_2' => string,
+	 *                                'city' => string,
+	 *                                'state' => string,
+	 *                                'postcode' => string,
+	 *                                'country' => string,
+	 *                                'phone' => string
+	 *                            ]
+	 * @param array               $destination Destination address data.
+	 *                            Structure: [
+	 *                                'name' => string,
+	 *                                'company' => string,
+	 *                                'address' => string,
+	 *                                'address_2' => string,
+	 *                                'city' => string,
+	 *                                'state' => string,
+	 *                                'postcode' => string,
+	 *                                'country' => string,
+	 *                                'phone' => string
+	 *                            ]
+	 * @param array               $customs Customs form information.
+	 *                            Structure: [
+	 *                                'contents_type' => string,
+	 *                                'restriction_type' => string,
+	 *                                'restriction_comments' => string,
+	 *                                'non_delivery_option' => string,
+	 *                                'customs_items' => [
+	 *                                    [
+	 *                                        'description' => string,
+	 *                                        'quantity' => int,
+	 *                                        'value' => float,
+	 *                                        'weight' => float,
+	 *                                        'hs_tariff_number' => string,
+	 *                                        'origin_country' => string
+	 *                                    ],
+	 *                                    ...
+	 *                                ]
+	 *                            ]
+	 * @param array               $shipment_dates Shipment date information.
+	 *                            Structure: [
+	 *                                'shipping_date' => string|null (label date),
+	 *                                'estimated_delivery_date' => string|null (estimated delivery)
+	 *                            ]
+	 * @return array Response array with success status and stored data.
+	 */
+	private function store_purchased_label_to_fulfillment(
+		$fulfillment,
+		$purchased_labels_meta,
+		$selected_rate,
+		$hazmat_config,
+		$origin_address,
+		$destination,
+		$customs,
+		$shipment_dates
+	) {
+		// Set the fulfillment status to unfulfilled by default. It will be updated to fulfilled when the label is purchased.
+		$fulfillment->set_status( 'unfulfilled' );
+		$fulfillment->set_labels( $purchased_labels_meta );
+		$fulfillment->set_shipping_label_rate( $selected_rate );
+		$fulfillment->set_shipping_label_hazmat( $hazmat_config );
+		$fulfillment->set_selected_origin( $origin_address );
+		$fulfillment->set_shipping_label_destination( $destination );
+		$fulfillment->set_shipping_label_customs( $customs );
+		$fulfillment->set_shipping_label_dates( $shipment_dates );
+		$fulfillment->save();
+
+		return array_merge(
+			$fulfillment->get_shipping_data(),
+			array(
+				'success' => true,
+			)
+		);
 	}
 }
